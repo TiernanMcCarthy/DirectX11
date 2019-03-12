@@ -1,0 +1,5 @@
+﻿  CameraOwn.cpp
+f:\directx-sdk-samples-master\direct3d11tutorials\tutorial04\cameraown.h(20): warning C4239: nonstandard extension used: 'argument': conversion from 'DirectX::XMVECTOR' to 'DirectX::XMVECTOR &'
+  f:\directx-sdk-samples-master\direct3d11tutorials\tutorial04\cameraown.h(20): note: A non-const reference may only be bound to an lvalue
+f:\directx-sdk-samples-master\direct3d11tutorials\tutorial04\cameraown.cpp(28): warning C4238: nonstandard extension used: class rvalue used as lvalue
+  Tutorial04_2015.vcxproj -> F:\directx-sdk-samples-master\Direct3D11Tutorials\Tutorial04\Debug\Tutorial04.exe
