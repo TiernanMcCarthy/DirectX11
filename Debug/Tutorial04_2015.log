@@ -1,5 +1,6 @@
-﻿  CameraOwn.cpp
-f:\directx-sdk-samples-master\direct3d11tutorials\tutorial04\cameraown.h(20): warning C4239: nonstandard extension used: 'argument': conversion from 'DirectX::XMVECTOR' to 'DirectX::XMVECTOR &'
-  f:\directx-sdk-samples-master\direct3d11tutorials\tutorial04\cameraown.h(20): note: A non-const reference may only be bound to an lvalue
-f:\directx-sdk-samples-master\direct3d11tutorials\tutorial04\cameraown.cpp(28): warning C4238: nonstandard extension used: class rvalue used as lvalue
-  Tutorial04_2015.vcxproj -> F:\directx-sdk-samples-master\Direct3D11Tutorials\Tutorial04\Debug\Tutorial04.exe
+﻿  Tutorial04.cpp
+\\su2\uw\up857997\directx11\cameraown.h(22): warning C4239: nonstandard extension used: 'argument': conversion from 'DirectX::XMVECTOR' to 'DirectX::XMVECTOR &'
+  \\su2\uw\up857997\directx11\cameraown.h(22): note: A non-const reference may only be bound to an lvalue
+\\su2\uw\up857997\directx11\tutorial04.cpp(277): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+\\su2\uw\up857997\directx11\tutorial04.cpp(278): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  Tutorial04_2015.vcxproj -> \\SU2\UW\UP857997\DirectX11\Debug\Tutorial04.exe

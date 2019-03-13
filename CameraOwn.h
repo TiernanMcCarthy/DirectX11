@@ -17,16 +17,22 @@ public:
 
 	void SetPos(XMFLOAT3 pos); //Set the position of the camera
 
+	void Rotate(float angle, XMFLOAT3 axis);
+
+	void UpdateCam();
+
+
 	const XMFLOAT3 Ups() { return GMathVF(GMathFV(Up) - GMathFV(Pos)); }
 
 	XMMATRIX ReturnViewMatrix();
+//	static XMFLOAT3 operator +(XMFLOAT3 a, XMFLOAT3 b);
 
 private:
 
 	XMFLOAT3 Pos; //Camera Position
 	XMFLOAT3 Eye; //Camera Target Location
 	XMFLOAT3 Up; //Camera Up parameter 
-
+	XMVECTOR EyeDefault;
 	//Projection parameters
 	float angle; //Angle of frustrum
 	float ClientWidth; //Client window dimensions
@@ -34,6 +40,11 @@ private:
 	float Nearest; //Nearest and furthest Planes for frustrum
 	float Furthest;
 
+	float pitch;
+	float yaw;
+	float roll;
+
+	XMMATRIX RotationMatrix;
 	XMFLOAT4X4 ViewMatrix; //Duh
 	XMFLOAT4X4 ProjectionMatrix;
 	XMFLOAT4X4 OrthographicMatrix; 

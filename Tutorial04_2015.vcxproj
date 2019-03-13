@@ -399,12 +399,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraOwn.cpp" />
-    <ClCompile Include="GCamera.cpp" />
     <ClCompile Include="Tutorial04.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CameraOwn.h" />
-    <ClInclude Include="GCamera.h" />
     <ClInclude Include="GUtility.h" />
     <CLInclude Include="resource.h" />
     <ResourceCompile Include="Tutorial04.rc" />

@@ -27,6 +27,9 @@ XMVECTOR Eye = XMVectorSet(0.0f, 5, -5.0f, 0.0f);
 XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 CameraOwn CamBhoy;
+
+float previousX=0; //Store these two for comparing the mouse position between frames
+float currentX;
 using namespace DirectX;
 //--------------------------------------------------------------------------------------
 // Structures
@@ -320,6 +323,12 @@ HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow )
     // Create window
     g_hInst = hInstance;
     RECT rc = { 0, 0, 800, 600 };
+	POINT ClientTopLeft; //Two corners for calculations
+	ClientTopLeft.x = rc.left;
+	ClientTopLeft.y = rc.top;
+	POINT ClientBottomRight; //Apparently there is 1 pixel not included ?
+	ClientBottomRight.x = rc.right+1;
+	ClientBottomRight.y = rc.bottom+1;
     AdjustWindowRect( &rc, WS_OVERLAPPEDWINDOW, FALSE );
     g_hWnd = CreateWindow( L"TutorialWindowClass", L"Direct3D 11 Tutorial 4: 3D Spaces",
                            WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
@@ -689,6 +698,7 @@ void CleanupDevice()
 
 char horizontal;
 char vertical;
+bool rotating = false;
 //--------------------------------------------------------------------------------------
 // Called every time the application receives a message
 //--------------------------------------------------------------------------------------
@@ -735,7 +745,10 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 			vertical = 'n';
 		}
 	}
-
+	//if (message=WM_MOUSEMOVE)
+	//{
+		//hdc = GetDC(hWnd); //Get the mouse
+	//}
 
     switch( message )
     {
@@ -747,7 +760,15 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
     case WM_DESTROY:
         PostQuitMessage( 0 );
         break;
-
+	case WM_MOUSEMOVE:
+		//PostQuitMessage(0);
+		previousX = currentX;//Replace the old previous
+		currentX=MAKEPOINTS(lParam).x;//Collect pointer coords?
+		rotating = true;
+		break;
+	case WM_NCMOUSELEAVE:
+		rotating = false;
+		break;
         // Note that this tutorial does not handle resizing (WM_SIZE) requests,
         // so we created the window without the resize border.
 
@@ -762,8 +783,15 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 // Render a frame
 //--------------------------------------------------------------------------------------
 object ech;
+bool once=true;
+float angle = 0;
 void Render()
 {
+	if (once)
+	{
+		CamBhoy.Rotate(90, XMFLOAT3(0, 0, 1));
+		once = false;
+	}
 	//ech.x = 6;
 	//bob[9].x = 4;
     // Update our time
@@ -787,13 +815,26 @@ void Render()
 	g_World *= XMMatrixRotationZ(t);
 	g_World *= XMMatrixRotationY(-t);
 	g_World2 = XMMatrixRotationZ(t);
+	
     //
     // Clear the back buffer
     //
+	if (currentX-previousX>previousX&&rotating==true)
+	{
+		//Move right
+		angle += 0.002f;
+		//CamBhoy.Rotate(angle, XMFLOAT3(0, 1, 0));
+	}
+	else if (currentX - previousX < previousX&&rotating == true)
+	{
+		//Move right
+		angle -= 0.002f;
+		//CamBhoy.Rotate(angle, XMFLOAT3(0, 1, 0));
+	}
 	//https://www.gamedev.net/articles/programming/graphics/directx-11-c-game-camera-r2978/
 	if (horizontal == 'r')
 	{
-		blob.x += 0.0003f;
+		//blob.x += 0.0003f;
 	//	Eye = XMVectorSet(blob.x, 0, -5.0f, 0.0f);
 	}
 	else if (horizontal == 'l')
@@ -811,6 +852,7 @@ void Render()
 	}
 	//Eye = XMVectorSet(blob.x,blob.y,-5, 0.0f);
 	//CamBhoy.SetPos(XMFLOAT3(blob.x, blob.y, blob.z));
+	//CamBhoy.Rotate(90, XMFLOAT3(0, 0, 0));
 	//blob.update();
 	//bool lolllll=IsColliding((XMFLOAT3(*bob[0].x, *bob[0].y, *bob[0].z)),blob);
 	//if (IsColliding((XMFLOAT3(*bob[0].x, *bob[0].y, *bob[0].z)), blob) == true)
