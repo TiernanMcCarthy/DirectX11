@@ -19,14 +19,15 @@
 #include <directxcolors.h>
 #include "resource.h"
 //#include "GCamera.h"
-#include "CameraOwn.h"
+//#include "CameraOwn.h"
+#include "CameraTest.h"
+#include <math.h>
+using namespace std;
 //using namespace Game;
 
 //GCamera cameraboy;
-XMVECTOR Eye = XMVectorSet(0.0f, 5, -5.0f, 0.0f);
-XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-CameraOwn CamBhoy;
+
+CameraTest CamBhoy;
 
 float previousX=0; //Store these two for comparing the mouse position between frames
 float currentX;
@@ -75,6 +76,38 @@ XMMATRIX                g_View;
 XMMATRIX                g_Projection;
 
 
+const float pi = 3.14159265359f;
+float DegtoRag(float v)
+{
+	float y = v * pi / 180;
+	return y;
+}
+
+
+XMFLOAT3 VectorSubtraction(XMFLOAT3 v1, XMFLOAT3 v2)
+{
+	XMFLOAT3 v3 = XMFLOAT3(v1.x - v2.x, v1.y - v2.y,v1.z-v2.z);
+	//XMFLOAT3 v3 = v1 - v2;
+	return (v3);
+}
+XMFLOAT3 EulerToDirection(float x, float y, float z)
+{
+	XMFLOAT3 temp;
+	temp.x = cosf(x) * sinf(y);
+	temp.y = sinf(x);
+	temp.z = cosf(y) * cosf(x);
+	return temp;
+}
+
+
+XMFLOAT3 ForwardDirection(XMFLOAT3 euler)
+{
+	XMFLOAT3 EulerRotation;
+	EulerRotation.x = euler.x;
+	EulerRotation.y = euler.y;
+	EulerRotation.z = euler.z;
+	return EulerToDirection(EulerRotation.x, EulerRotation.y, EulerRotation.z);
+}
 //--------------------------------------------------------------------------------------
 // Forward declarations
 //--------------------------------------------------------------------------------------
@@ -220,7 +253,14 @@ bool Intersects(object2 a, object2 b) //Check all axis to see if they're more th
 		|| b.z + b.maxZ < a.minZ);
 }
 
+class Camera :object2
+{
+	void update()
+	{
 
+	}
+
+};
 
 
 //https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
@@ -322,7 +362,7 @@ HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow )
 
     // Create window
     g_hInst = hInstance;
-    RECT rc = { 0, 0, 800, 600 };
+    RECT rc = { 0, 0, 1920, 1080 };
 	POINT ClientTopLeft; //Two corners for calculations
 	ClientTopLeft.x = rc.left;
 	ClientTopLeft.y = rc.top;
@@ -664,7 +704,9 @@ HRESULT InitDevice()
 	g_World = XMMatrixIdentity();
 
     // Initialize the view matrix
-
+	XMVECTOR Eye = XMVectorSet(0.0f, 5, -5.0f, 0.0f);
+	XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	g_View = XMMatrixLookAtLH( Eye, At, Up );
 
     // Initialize the projection matrix
@@ -699,6 +741,25 @@ void CleanupDevice()
 char horizontal;
 char vertical;
 bool rotating = false;
+
+float mousespeed = 2;
+void MouseMovement()
+{
+	float temp = currentX / previousX;
+	//CamBhoy.Rotate(0, 0.00003f*temp, 0);
+	if (currentX<previousX)
+	{
+		CamBhoy.Rotate(0, -0.007f, 0);
+	}
+	else if (currentX > previousX)
+	{
+		CamBhoy.Rotate(0, 0.007f, 0);
+	}
+	//CamBhoy.SetRotation()
+}
+
+
+char forwardtime;
 //--------------------------------------------------------------------------------------
 // Called every time the application receives a message
 //--------------------------------------------------------------------------------------
@@ -720,6 +781,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 		if (wParam == 'W')
 		{
 			vertical = 'u'; //UP
+			forwardtime = true;
 		}
 		if (wParam == 'S')
 		{
@@ -762,9 +824,9 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
         break;
 	case WM_MOUSEMOVE:
 		//PostQuitMessage(0);
+		MouseMovement();
 		previousX = currentX;//Replace the old previous
-		currentX=MAKEPOINTS(lParam).x;//Collect pointer coords?
-		rotating = true;
+		currentX = MAKEPOINTS(lParam).x;//Collect pointer coords?
 		break;
 	case WM_NCMOUSELEAVE:
 		rotating = false;
@@ -779,6 +841,9 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
     return 0;
 }
 
+
+float rotty;
+float speed = 0.0003f;
 //--------------------------------------------------------------------------------------
 // Render a frame
 //--------------------------------------------------------------------------------------
@@ -787,9 +852,11 @@ bool once=true;
 float angle = 0;
 void Render()
 {
-	if (once)
+	if (rotating==true)
 	{
-		CamBhoy.Rotate(90, XMFLOAT3(0, 0, 1));
+		//CamBhoy.Rotate(90, XMFLOAT3(0, 0, 1));
+		rotty += 0.00003f;
+		CamBhoy.SetRotation(0, rotty, 0);
 		once = false;
 	}
 	//ech.x = 6;
@@ -835,6 +902,7 @@ void Render()
 	if (horizontal == 'r')
 	{
 		//blob.x += 0.0003f;
+		CamBhoy.SetRotation(0, rotty, 0);
 	//	Eye = XMVectorSet(blob.x, 0, -5.0f, 0.0f);
 	}
 	else if (horizontal == 'l')
@@ -844,17 +912,14 @@ void Render()
 	}
 	if (vertical == 'u')
 	{
-		blob.y += 0.0003f;
+		XMFLOAT3 temp=ForwardDirection(CamBhoy.GetRotionFloat3());
+
+		CamBhoy.MoveFrom(temp.x*speed, temp.y*speed, temp.z*speed);
 	}
 	else if (vertical == 'd')
 	{
 		blob.y -= 0.0003f;
 	}
-	//Eye = XMVectorSet(blob.x,blob.y,-5, 0.0f);
-	//CamBhoy.SetPos(XMFLOAT3(blob.x, blob.y, blob.z));
-	//CamBhoy.Rotate(90, XMFLOAT3(0, 0, 0));
-	//blob.update();
-	//bool lolllll=IsColliding((XMFLOAT3(*bob[0].x, *bob[0].y, *bob[0].z)),blob);
 	//if (IsColliding((XMFLOAT3(*bob[0].x, *bob[0].y, *bob[0].z)), blob) == true)
 	if (Intersects(blob2,blob)==true)
 	{
@@ -869,37 +934,9 @@ void Render()
 		bob[i].update();
 		//g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView, Colors::MidnightBlue);
 	}
+	//CamBhoy.SetPos(blob.x, blob.y, -5);
 	blob.update();
-	g_View = CamBhoy.ReturnViewMatrix();
-	//g_View = CamBhoy.ReturnViewMatrix();
-	//ech.update();
-	//bob.update();
-    //
-    // Update variables
-    //
-    /*ConstantBuffer cb;
-	cb.mWorld = XMMatrixTranspose( g_World );
-	cb.mView = XMMatrixTranspose( g_View );
-	cb.mProjection = XMMatrixTranspose( g_Projection );
-	g_pImmediateContext->UpdateSubresource( g_pConstantBuffer, 0, nullptr, &cb, 0, 0 );
-
-	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
-	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pConstantBuffer);
-	g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
-	g_pImmediateContext->DrawIndexed(36, 0, 0);        // 36 vertices needed for 12 triangles in a triangle list
-	//
-	ConstantBuffer cb2;
-	cb2.mWorld = XMMatrixTranspose(g_World2);
-	cb2.mView = XMMatrixTranspose(g_View);
-	cb2.mProjection = XMMatrixTranspose(g_Projection);
-	g_pImmediateContext->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb2, 0, 0);
-    //
-    // Renders a triangle
-    //
-	g_pImmediateContext->VSSetShader( g_pVertexShader, nullptr, 0 );
-	g_pImmediateContext->VSSetConstantBuffers( 0, 1, &g_pConstantBuffer );
-	g_pImmediateContext->PSSetShader( g_pPixelShader, nullptr, 0 );
-	g_pImmediateContext->DrawIndexed( 36, 0, 0 );        // 36 vertices needed for 12 triangles in a triangle list
+	g_View = CamBhoy.GetViewMatrix();
 
     //
     // Present our back buffer to our front buffer*/

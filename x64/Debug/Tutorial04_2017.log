@@ -1,0 +1,7 @@
+﻿  Tutorial04.cpp
+c:\users\tiernan\documents\real directx\directx11\cameratest.h(36): warning C4324: 'CameraTest': structure was padded due to alignment specifier
+c:\users\tiernan\documents\real directx\directx11\tutorial04.cpp(93): warning C4100: 'z': unreferenced formal parameter
+c:\users\tiernan\documents\real directx\directx11\tutorial04.cpp(317): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\tiernan\documents\real directx\directx11\tutorial04.cpp(318): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\tiernan\documents\real directx\directx11\tutorial04.cpp(748): warning C4189: 'temp': local variable is initialized but not referenced
+  Tutorial04_2017.vcxproj -> C:\Users\Tiernan\Documents\Real DirectX\DirectX11\x64\Debug\Tutorial04.exe
