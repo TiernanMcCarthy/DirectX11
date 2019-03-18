@@ -1,6 +1,7 @@
 ﻿  Tutorial04.cpp
-\\su2\uw\up857997\directx11\cameraown.h(22): warning C4239: nonstandard extension used: 'argument': conversion from 'DirectX::XMVECTOR' to 'DirectX::XMVECTOR &'
-  \\su2\uw\up857997\directx11\cameraown.h(22): note: A non-const reference may only be bound to an lvalue
-\\su2\uw\up857997\directx11\tutorial04.cpp(277): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-\\su2\uw\up857997\directx11\tutorial04.cpp(278): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-  Tutorial04_2015.vcxproj -> \\SU2\UW\UP857997\DirectX11\Debug\Tutorial04.exe
+d:\directx11\cameratest.h(36): warning C4324: 'CameraTest': structure was padded due to alignment specifier
+d:\directx11\tutorial04.cpp(93): warning C4100: 'z': unreferenced formal parameter
+d:\directx11\tutorial04.cpp(247): error C2719: 'a': formal parameter with requested alignment of 16 won't be aligned
+d:\directx11\tutorial04.cpp(247): error C2719: 'b': formal parameter with requested alignment of 16 won't be aligned
+d:\directx11\tutorial04.cpp(317): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+d:\directx11\tutorial04.cpp(318): warning C4244: '=': conversion from 'int' to 'float', possible loss of data

@@ -31,6 +31,8 @@ CameraTest CamBhoy;
 
 float previousX=0; //Store these two for comparing the mouse position between frames
 float currentX;
+float currentY;
+float previousY;
 using namespace DirectX;
 //--------------------------------------------------------------------------------------
 // Structures
@@ -265,7 +267,7 @@ class Camera :object2
 
 //https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
 //Axis Alligned Bounding Box that returns true upon collision
-bool PointCollision(XMFLOAT3 point, object2 box) //Pass the point you're testing, and take bounding from object class
+/*bool PointCollision(XMFLOAT3 point, object2 box) //Pass the point you're testing, and take bounding from object class
 {
 	//Check outside in every axis, early out in first one
 	//If not outside  of any, it must be inside
@@ -277,7 +279,7 @@ bool PointCollision(XMFLOAT3 point, object2 box) //Pass the point you're testing
 		return false;
 
 	return true;
-}
+}*/
 
 //DO THIS BUT TRY EVERY POINT
 
@@ -337,7 +339,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
     return ( int )msg.wParam;
 }
 
-
+RECT rc = { 0, 0, 1280, 1024 };
 //--------------------------------------------------------------------------------------
 // Register class and create window
 //--------------------------------------------------------------------------------------
@@ -357,12 +359,14 @@ HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow )
     wcex.lpszMenuName = nullptr;
     wcex.lpszClassName = L"TutorialWindowClass";
     wcex.hIconSm = LoadIcon( wcex.hInstance, ( LPCTSTR )IDI_TUTORIAL1 );
+	SetCursor(wcex.hCursor);
+	SetCursorPos(rc.right / 2, rc.bottom / 2);
+	//Device.SetCursorPosition(rc.right / 2, rc.bottom / 2,true);
     if( !RegisterClassEx( &wcex ) )
         return E_FAIL;
 
     // Create window
     g_hInst = hInstance;
-    RECT rc = { 0, 0, 1920, 1080 };
 	POINT ClientTopLeft; //Two corners for calculations
 	ClientTopLeft.x = rc.left;
 	ClientTopLeft.y = rc.top;
@@ -741,7 +745,7 @@ void CleanupDevice()
 char horizontal;
 char vertical;
 bool rotating = false;
-
+//https://www.braynzarsoft.net/viewtutorial/q16390-11-textures
 float mousespeed = 2;
 void MouseMovement()
 {
@@ -749,15 +753,25 @@ void MouseMovement()
 	//CamBhoy.Rotate(0, 0.00003f*temp, 0);
 	if (currentX<previousX)
 	{
-		CamBhoy.Rotate(0, -0.007f, 0);
+		CamBhoy.Rotate(0, -currentX*0.00005f, 0);
 	}
 	else if (currentX > previousX)
 	{
-		CamBhoy.Rotate(0, 0.007f, 0);
+		CamBhoy.Rotate(0, currentX*0.00005f, 0);
 	}
+	if (currentY < previousY)
+	{
+		CamBhoy.Rotate(-currentY*0.00005f, 0, 0);
+	}
+	else if (currentY > previousY)
+	{
+		CamBhoy.Rotate(currentY*0.00005f, 0, 0);
+	}
+	//SetCursorPos(rc.right / 2, rc.bottom / 2);
+	//SetPhysicalCursorPos(rc.right / 2, rc.bottom / 2);
 	//CamBhoy.SetRotation()
 }
-
+RECT sizey = { 0,0,1280,1024 };
 
 char forwardtime;
 //--------------------------------------------------------------------------------------
@@ -825,8 +839,11 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 	case WM_MOUSEMOVE:
 		//PostQuitMessage(0);
 		MouseMovement();
+		//ClipCursor(&sizey);
 		previousX = currentX;//Replace the old previous
 		currentX = MAKEPOINTS(lParam).x;//Collect pointer coords?
+		previousY = currentY;
+		currentY = MAKEPOINTS(lParam).y;
 		break;
 	case WM_NCMOUSELEAVE:
 		rotating = false;
@@ -914,7 +931,7 @@ void Render()
 	{
 		XMFLOAT3 temp=ForwardDirection(CamBhoy.GetRotionFloat3());
 
-		CamBhoy.MoveFrom(temp.x*speed, temp.y*speed, temp.z*speed);
+		CamBhoy.MoveFrom(temp.x*speed, 0, temp.z*speed);
 	}
 	else if (vertical == 'd')
 	{
@@ -937,7 +954,6 @@ void Render()
 	//CamBhoy.SetPos(blob.x, blob.y, -5);
 	blob.update();
 	g_View = CamBhoy.GetViewMatrix();
-
     //
     // Present our back buffer to our front buffer*/
     //

@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tutorial04.cpp" />
+    <ClCompile Include="CameraTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">
@@ -20,6 +21,8 @@
     <ResourceCompile Include="Tutorial04.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+    <ClInclude Include="CameraTest.h" />
+    <ClInclude Include="GUtility.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Tutorial04.fx">

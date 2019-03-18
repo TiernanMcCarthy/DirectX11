@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Tutorial04.cpp" />
     <ClCompile Include="CameraTest.cpp" />
+    <ClCompile Include="ModelLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">
