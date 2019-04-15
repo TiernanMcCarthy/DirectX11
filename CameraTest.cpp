@@ -89,7 +89,7 @@ void CameraTest::Rotate(float x, float y, float z)
 	Rotation.z += z;
 	this->UpdateViewMatrix();
 }
-
+//https://www.youtube.com/watch?v=yKscl6GuUVI&list=PLcacUGyBsOIBlGyQQWzp6D1Xn6ZENx9Y2&index=33
 void CameraTest::UpdateViewMatrix() //Update the view matrix and the movement
 {
 	//Calculate Rotation Matrix

@@ -2,7 +2,7 @@
 #include "GUtility.h"
 class CameraTest
 {
-public: 
+public:
 	CameraTest(void);
 	const XMMATRIX & GetViewMatrix() const;
 	const XMMATRIX & GetProjectionMatrix() const;

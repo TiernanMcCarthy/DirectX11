@@ -1,6 +1,6 @@
 //GCamera.h
 #pragma once
-//#include "GUtility.h"
+#include "GUtility.h"
 #include <stdint.h>
 #include <d3d11_1.h>
 #include <d3dcompiler.h>
