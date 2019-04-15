@@ -1,0 +1,3 @@
+﻿  AABB.cpp
+c:\users\tiernan\desktop\tutorial07\aabb.cpp(66): error C3867: 'AABB::Right': non-standard syntax; use '&' to create a pointer to member
+c:\users\tiernan\desktop\tutorial07\aabb.cpp(66): error C2297: '+': illegal, right operand has type 'float (__thiscall AABB::* )(void)'

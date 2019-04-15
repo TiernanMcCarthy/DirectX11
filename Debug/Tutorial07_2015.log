@@ -1,0 +1,32 @@
+﻿  DDSTextureLoader.cpp
+  Tutorial07.cpp
+c:\users\tiernan\desktop\tutorial07\cameratest.h(36): warning C4324: 'CameraTest': structure was padded due to alignment specifier
+c:\users\tiernan\desktop\tutorial07\tutorial07.cpp(758): warning C4189: 'temp': local variable is initialized but not referenced
+c:\users\tiernan\desktop\tutorial07\tutorial07.cpp(886): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\tiernan\desktop\tutorial07\tutorial07.cpp(881): warning C4189: 'bobly': local variable is initialized but not referenced
+c:\users\tiernan\desktop\tutorial07\tutorial07.cpp(938): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\tiernan\desktop\tutorial07\tutorial07.cpp(945): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\tiernan\desktop\tutorial07\tutorial07.cpp(1008): warning C4238: nonstandard extension used: class rvalue used as lvalue
+c:\users\tiernan\desktop\tutorial07\tutorial07.cpp(1046): warning C4238: nonstandard extension used: class rvalue used as lvalue
+c:\users\tiernan\desktop\tutorial07\tutorial07.cpp(1048): warning C4456: declaration of 'cb' hides previous local declaration
+  c:\users\tiernan\desktop\tutorial07\tutorial07.cpp(1010): note: see declaration of 'cb'
+  Generating Code...
+DDSTextureLoader.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
+Tutorial07.obj : error LNK2019: unresolved external symbol "struct DirectX::XMFLOAT3 __cdecl ForwardDirection(struct DirectX::XMFLOAT3)" (?ForwardDirection@@YA?AUXMFLOAT3@DirectX@@U12@@Z) referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "struct DirectX::XMFLOAT3 __cdecl operator*(struct DirectX::XMFLOAT3,float)" (??D@YA?AUXMFLOAT3@DirectX@@U01@M@Z) referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "struct DirectX::XMFLOAT3 __cdecl operator+(struct DirectX::XMFLOAT3,struct DirectX::XMFLOAT3)" (??H@YA?AUXMFLOAT3@DirectX@@U01@0@Z) referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: __thiscall Object::Object(void)" (??0Object@@QAE@XZ) referenced in function "void __cdecl `dynamic initializer for 'ObjectList''(void)" (??__EObjectList@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: __thiscall Object::Object(struct DirectX::XMFLOAT3)" (??0Object@@QAE@UXMFLOAT3@DirectX@@@Z) referenced in function "void __cdecl `dynamic initializer for 'test2''(void)" (??__Etest2@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: __thiscall Object::Object(struct DirectX::XMFLOAT3,bool)" (??0Object@@QAE@UXMFLOAT3@DirectX@@_N@Z) referenced in function "void __cdecl `dynamic initializer for 'Selector''(void)" (??__ESelector@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: void __thiscall Object::SetPos(struct DirectX::XMFLOAT3)" (?SetPos@Object@@QAEXUXMFLOAT3@DirectX@@@Z) referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: void __thiscall Object::SetPos(float,float,float)" (?SetPos@Object@@QAEXMMM@Z) referenced in function "void __cdecl runthroughtheselads(void)" (?runthroughtheselads@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: struct DirectX::XMFLOAT3 __thiscall Object::GetPos(void)" (?GetPos@Object@@QAE?AUXMFLOAT3@DirectX@@XZ) referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: void __thiscall Object::Move(struct DirectX::XMFLOAT3)" (?Move@Object@@QAEXUXMFLOAT3@DirectX@@@Z) referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: void __thiscall Object::Move(float,float,float)" (?Move@Object@@QAEXMMM@Z) referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: __thiscall CameraTest::CameraTest(void)" (??0CameraTest@@QAE@XZ) referenced in function "void __cdecl `dynamic initializer for 'CamBhoy''(void)" (??__ECamBhoy@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: struct DirectX::XMMATRIX const & __thiscall CameraTest::GetViewMatrix(void)const " (?GetViewMatrix@CameraTest@@QBEABUXMMATRIX@DirectX@@XZ) referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: struct DirectX::XMFLOAT3 const & __thiscall CameraTest::GetPos(void)const " (?GetPos@CameraTest@@QBEABUXMFLOAT3@DirectX@@XZ) referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: struct DirectX::XMFLOAT3 const & __thiscall CameraTest::GetRotionFloat3(void)const " (?GetRotionFloat3@CameraTest@@QBEABUXMFLOAT3@DirectX@@XZ) referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: void __thiscall CameraTest::MoveFrom(float,float,float)" (?MoveFrom@CameraTest@@QAEXMMM@Z) referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+Tutorial07.obj : error LNK2019: unresolved external symbol "public: void __thiscall CameraTest::Rotate(float,float,float)" (?Rotate@CameraTest@@QAEXMMM@Z) referenced in function "void __cdecl MouseMovement(void)" (?MouseMovement@@YAXXZ)
+C:\Users\Tiernan\Desktop\Tutorial07\Debug\Tutorial07.exe : fatal error LNK1120: 17 unresolved externals
