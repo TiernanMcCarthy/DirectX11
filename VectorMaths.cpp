@@ -13,6 +13,8 @@ float DegtoRag(float v) //Degrees to Radians
 	return y;
 }
 
+
+
 XMFLOAT3 VectorSubtraction(XMFLOAT3 v1, XMFLOAT3 v2)//Function for subtracting two vectors and returning the result
 {
 	XMFLOAT3 v3 = XMFLOAT3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
@@ -39,6 +41,20 @@ XMFLOAT3 ForwardDirection(XMFLOAT3 euler)  //Supply a Forward Direction Vector
 	return EulerToDirection(EulerRotation.x, EulerRotation.y, EulerRotation.z);
 }
 
+float VectorMagnitude(XMFLOAT3 v1)
+{
+	//  float temp = Mathf.Sqrt(v1.x * v1.x) + Mathf.Sqrt(v1.y * v1.y)+Mathf.Sqrt(v1.z*v1.z);
+	float temp = sqrtf((v1.x * v1.x) + (v1.y * v1.y) + (v1.z * v1.z));
+	return temp;
+}
+
+
+float LengthSq(XMFLOAT3 v1)
+{
+	float temp = VectorMagnitude(v1);
+	return (temp * temp);
+}
+
 XMFLOAT3 operator *(XMFLOAT3 a, float t) //Allow the multiplication of two XMFLOAT3 Vectors, as it is not natively supported
 {
 	XMFLOAT3 result = XMFLOAT3(a.x*t, a.y*t, a.z*t);
@@ -57,9 +73,20 @@ bool operator ==(XMFLOAT3 a, XMFLOAT3 t) //Allow comparisons of two XMFLOAT3s be
 	}
 	return false;
 }
-
-
+XMFLOAT3 operator -(XMFLOAT3 a, XMFLOAT3 t)
+{
+	XMFLOAT3 result = XMFLOAT3(a.x - t.x, a.y - t.y, a.z - t.z);
+	return result;
+}
+XMFLOAT2 operator -(XMFLOAT2 a, XMFLOAT2 t) //Allow the minus of two XMFLOAT2s
+{
+	return XMFLOAT2(a.x - t.x, a.y - t.y);
+}
 XMFLOAT3 VectorLerp(XMFLOAT3 A, XMFLOAT3 B, float t)  //Lerp values between two Vectors
 {
 	return A * (1.0f - t) + B * t;
+}
+XMFLOAT3 operator +=(XMFLOAT3 a, XMFLOAT3 b)
+{
+	return XMFLOAT3(a.x + b.x, a.y + b.y, a.z + b.z);
 }

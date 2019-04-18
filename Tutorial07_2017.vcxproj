@@ -399,6 +399,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AABB.cpp" />
+    <ClCompile Include="BoundingSphere.cpp" />
     <ClCompile Include="CameraMain.cpp" />
     <ClCompile Include="CameraTest.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
@@ -408,6 +409,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABB.h" />
+    <ClInclude Include="BoundingSphere.h" />
     <ClInclude Include="CameraTest.h" />
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="GUtility.h" />

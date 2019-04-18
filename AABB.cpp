@@ -60,17 +60,20 @@ float AABB::Back()
 //		|| Box2.Front() > Box1.Back());
 //}
 
-bool Intersects(AABB a, AABB b) //Check all axis to see if they're more than any of the others and if they are collision has not occurred
-{
-	return!(b.pos.x + b.Left() > a.Right()
-		|| b.pos.x + b.Right<a.Left()
-		|| b.pos.y + b.Top()<a.Bottom()
-		|| b.pos.y + b.Bottom()>a.Top()
-		|| b.pos.z + b.Back()>a.Front()
-		|| b.pos.z + b.Front() < a.Back());
-}
+//bool Intersects(AABB a, AABB b) //Check all axis to see if they're more than any of the others and if they are collision has not occurred
+//{
+//	return!(b.pos.x + b.Left() > a.Right()
+//		|| b.pos.x + b.Right()<a.Left()
+//		|| b.pos.y + b.Top()<a.Bottom()
+//		|| b.pos.y + b.Bottom()>a.Top()
+//		|| b.pos.z + b.Back()>a.Front()
+	//	|| b.pos.z + b.Front() < a.Back());
+//}
 
-
+//bool Intersects(AABB b) //Check all axis to see if they're more than any of the others and if they are collision has not occurred
+//{
+//	return false;
+//}
 bool AABB::IntersectingAxis(XMFLOAT3 Axis, AABB Box, XMFLOAT3 StartPoint, XMFLOAT3 EndPoint, float *Lowest, float *Highest)
 {
 	//Calculate Minimum and Maximum based on the current axis

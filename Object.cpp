@@ -62,6 +62,19 @@ void Object::Move(float x,float y,float z)
 	this->pos = XMFLOAT3(this->pos.x + x, this->pos.y + y, this->pos.z);
 }
 
+bool Object::Intersects(Object b)
+{
+	return!(b.pos.x + b.minX > this->pos.x + this->maxX
+		|| b.pos.x + b.maxX<this->pos.x + this->minX
+		|| b.pos.y + b.maxY<this->pos.y + this->minY
+		|| b.pos.y + b.minY>this->pos.y + this->maxY
+		|| b.pos.z + b.minZ>this->pos.z + this->maxZ
+		|| b.pos.z + b.maxZ < this->pos.z + this->minZ
+		);
+}
+
+
+
 //bool Intersects(object2 a, object2 b) //Check all axis to see if they're more than any of the others and if they are collision has not occurred
 //{
 	//return!(b.x + b.minX > a.maxX

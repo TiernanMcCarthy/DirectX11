@@ -18,7 +18,7 @@ public:
 	//bool Intersects(AABB Box1, AABB Box2); //A function that is supplied two bounding boxes and checks if they collide
 	bool IntersectingAxis(XMFLOAT3 Axis, AABB Box, XMFLOAT3 StartPoint, XMFLOAT3 EndPoint, float *Lowest, float *Highest);
 	bool LineIntersection(AABB Box, XMFLOAT3 StartPoint, XMFLOAT3 EndPoint, XMFLOAT3 *IntersectionPoint);
-	
+	//bool Intersects(AABB Box1, AABB Box2);
 		//Set Directional Vectors local to AABB
 	XMFLOAT3 Righty;
 	XMFLOAT3 Up;
@@ -28,5 +28,3 @@ private:
 	XMFLOAT3 MinExtent;
 	XMFLOAT3 MaxExtent;
 };
-
-bool Intersects(AABB Box1, AABB Box2);
