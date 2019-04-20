@@ -81,6 +81,10 @@ void Object::SetTexture(wchar_t Name[40], ID3D11Device* g_pd3dDevice)
 {
 	CreateDDSTextureFromFile(g_pd3dDevice, Name, nullptr, &g_pTextureRV);
 }
+void Object::SetTexture(ID3D11ShaderResourceView* local, ID3D11Device* g_pd3dDevice)
+{
+	g_pTextureRV = local;
+}
 //bool Intersects(object2 a, object2 b) //Check all axis to see if they're more than any of the others and if they are collision has not occurred
 //{
 	//return!(b.x + b.minX > a.maxX

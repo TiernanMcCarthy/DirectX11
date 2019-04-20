@@ -19,6 +19,7 @@ public:
 	void Move(float x, float y, float z);
 
 	void SetTexture(wchar_t Name[40], ID3D11Device* g_pd3dDevice);
+	void SetTexture(ID3D11ShaderResourceView* local, ID3D11Device* g_pd3dDevice);
 	ID3D11ShaderResourceView* Texture();
 	//Bounding Box
 	float maxX;

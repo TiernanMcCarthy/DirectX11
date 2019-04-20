@@ -1,4 +1,7 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Tutorial04.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  Object.cpp
+f:\more bloody directx11\directx11\object.cpp(60): warning C4100: 'z': unreferenced formal parameter
+f:\more bloody directx11\directx11\object.cpp(84): warning C4100: 'g_pd3dDevice': unreferenced formal parameter
   Tutorial07.cpp
 f:\more bloody directx11\directx11\cameratest.h(36): warning C4324: 'CameraTest': structure was padded due to alignment specifier
 f:\more bloody directx11\directx11\tutorial07.cpp(658): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
@@ -6,11 +9,12 @@ f:\more bloody directx11\directx11\tutorial07.cpp(672): warning C4100: 'height':
 f:\more bloody directx11\directx11\tutorial07.cpp(761): warning C4189: 'temp': local variable is initialized but not referenced
 f:\more bloody directx11\directx11\tutorial07.cpp(899): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 f:\more bloody directx11\directx11\tutorial07.cpp(894): warning C4189: 'bobly': local variable is initialized but not referenced
-f:\more bloody directx11\directx11\tutorial07.cpp(950): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
-f:\more bloody directx11\directx11\tutorial07.cpp(954): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-f:\more bloody directx11\directx11\tutorial07.cpp(993): warning C4127: conditional expression is constant
-  f:\more bloody directx11\directx11\tutorial07.cpp(993): note: consider using 'if constexpr' statement instead
-f:\more bloody directx11\directx11\tutorial07.cpp(995): warning C4238: nonstandard extension used: class rvalue used as lvalue
-f:\more bloody directx11\directx11\tutorial07.cpp(1020): warning C4238: nonstandard extension used: class rvalue used as lvalue
-f:\more bloody directx11\directx11\tutorial07.cpp(1044): warning C4238: nonstandard extension used: class rvalue used as lvalue
+f:\more bloody directx11\directx11\tutorial07.cpp(956): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+f:\more bloody directx11\directx11\tutorial07.cpp(960): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+f:\more bloody directx11\directx11\tutorial07.cpp(999): warning C4127: conditional expression is constant
+  f:\more bloody directx11\directx11\tutorial07.cpp(999): note: consider using 'if constexpr' statement instead
+f:\more bloody directx11\directx11\tutorial07.cpp(1001): warning C4238: nonstandard extension used: class rvalue used as lvalue
+f:\more bloody directx11\directx11\tutorial07.cpp(1027): warning C4238: nonstandard extension used: class rvalue used as lvalue
+f:\more bloody directx11\directx11\tutorial07.cpp(1051): warning C4238: nonstandard extension used: class rvalue used as lvalue
+  Generating Code...
   Tutorial07_2017.vcxproj -> F:\More Bloody DirectX11\DirectX11\x64\Debug\Tutorial07.exe

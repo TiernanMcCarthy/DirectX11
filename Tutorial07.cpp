@@ -908,6 +908,8 @@ XMFLOAT3 temp;
 bool legitonce = true;
 Object Selector = Object(XMFLOAT3(0, 0, 0), true);
 Room bob(5, 5, 5);
+ID3D11ShaderResourceView* Animate[4];
+int animy = 0;
 void Render()
 {
 	// Update our time
@@ -915,6 +917,10 @@ void Render()
 	{
 		ObjectList[3].SetPos(XMFLOAT3(6, 7, 0));
 		legitonce = false;
+		CreateDDSTextureFromFile(g_pd3dDevice, L"Test.dds", nullptr, &Animate[0]);
+		CreateDDSTextureFromFile(g_pd3dDevice, L"Test1.dds", nullptr, &Animate[1]);
+		CreateDDSTextureFromFile(g_pd3dDevice, L"Test2.dds", nullptr, &Animate[2]);
+		CreateDDSTextureFromFile(g_pd3dDevice, L"Test3.dds", nullptr, &Animate[3]);
 		wchar_t Name[40] = L"Test.dds";
 		Selector.SetTexture(Name, g_pd3dDevice);
 	}
@@ -1003,6 +1009,7 @@ void Render()
 		//
 		// Render the cube
 		//
+		Selector.SetTexture(Animate[animy], g_pd3dDevice);
 		ID3D11ShaderResourceView*           tempy = Selector.Texture();
 		g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
 		g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBNeverChanges);
@@ -1060,6 +1067,14 @@ void Render()
 		g_pImmediateContext->PSSetShaderResources(0, 1, &g_pTextureRV);
 		g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
+	}
+	if (animy<3)
+	{
+		animy++;
+	}
+	else
+	{
+		animy = 0;
 	}
 	g_View = CamBhoy.GetViewMatrix();
 	g_pSwapChain->Present(0, 0);
