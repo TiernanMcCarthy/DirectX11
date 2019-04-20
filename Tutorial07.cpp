@@ -32,8 +32,8 @@
 	//float y = v * pi / 180;
 	//return y;
 //}
-#define RenderSelector false
-#define SelectorDistance 2.5f
+#define RenderSelector true
+#define SelectorDistance 5.0f
 #define speed 0.0005f
 
 using namespace DirectX;
@@ -915,6 +915,8 @@ void Render()
 	{
 		ObjectList[3].SetPos(XMFLOAT3(6, 7, 0));
 		legitonce = false;
+		wchar_t Name[40] = L"Test.dds";
+		Selector.SetTexture(Name, g_pd3dDevice);
 	}
 	static float t = 0.0f;
 	if (g_driverType == D3D_DRIVER_TYPE_REFERENCE)
@@ -1001,13 +1003,14 @@ void Render()
 		//
 		// Render the cube
 		//
+		ID3D11ShaderResourceView*           tempy = Selector.Texture();
 		g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
 		g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBNeverChanges);
 		g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
 		g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
 		g_pImmediateContext->PSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
-		g_pImmediateContext->PSSetShaderResources(0, 1, &g_pTextureRV);
+		g_pImmediateContext->PSSetShaderResources(0, 1, &tempy);
 		g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
 	}
@@ -1031,6 +1034,7 @@ void Render()
 		g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
 		g_pImmediateContext->PSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->PSSetShaderResources(0, 1, &g_pTextureRV);
+		//g_pImmediateContext->PSSetShaderResources(0, 1, &tempy);
 		g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
 	}

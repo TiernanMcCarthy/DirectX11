@@ -1,7 +1,7 @@
 
 #include "Object.h"
 #include "GUtility.h"
-
+#include "DDSTextureLoader.h"
 Object::Object(void) //Default object with origin at 0,0,0
 {
 	this->pos = XMFLOAT3(0, 0, 0);
@@ -57,7 +57,7 @@ void Object::Move(XMFLOAT3 newpos)
 {
 	this->pos = XMFLOAT3(this->pos.x + newpos.x, this->pos.y + newpos.y, this->pos.z + newpos.z);
 }
-void Object::Move(float x,float y,float z)
+void Object::Move(float x, float y, float z)
 {
 	this->pos = XMFLOAT3(this->pos.x + x, this->pos.y + y, this->pos.z);
 }
@@ -73,8 +73,14 @@ bool Object::Intersects(Object b)
 		);
 }
 
-
-
+ID3D11ShaderResourceView* Object::Texture() //Return the texture of this object for rendering
+{
+	return g_pTextureRV;
+}
+void Object::SetTexture(wchar_t Name[40], ID3D11Device* g_pd3dDevice)
+{
+	CreateDDSTextureFromFile(g_pd3dDevice, Name, nullptr, &g_pTextureRV);
+}
 //bool Intersects(object2 a, object2 b) //Check all axis to see if they're more than any of the others and if they are collision has not occurred
 //{
 	//return!(b.x + b.minX > a.maxX
