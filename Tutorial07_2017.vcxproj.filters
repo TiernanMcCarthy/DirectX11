@@ -31,7 +31,12 @@
     <ClCompile Include="BoundingSphere.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Target.cpp" />
+    <ClCompile Include="Target.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Goal.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tutorial07.cpp" />
@@ -59,6 +64,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Target.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Goal.h">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

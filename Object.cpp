@@ -85,6 +85,21 @@ void Object::SetTexture(ID3D11ShaderResourceView* local, ID3D11Device* g_pd3dDev
 {
 	g_pTextureRV = local;
 }
+void Object::SetRotation(XMFLOAT3 t)
+{
+	rot = t;
+	RotationMatrix = XMMatrixRotationY(t.y);
+}
+//Return Rotation as XMFLOAT3
+XMFLOAT3 Object::GetRotation() 
+{
+	return rot;
+} 
+XMMATRIX Object::GetRotationMatrix()
+{
+	return RotationMatrix;
+}
+
 //bool Intersects(object2 a, object2 b) //Check all axis to see if they're more than any of the others and if they are collision has not occurred
 //{
 	//return!(b.x + b.minX > a.maxX

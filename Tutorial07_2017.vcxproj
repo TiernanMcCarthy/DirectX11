@@ -403,6 +403,7 @@
     <ClCompile Include="CameraMain.cpp" />
     <ClCompile Include="CameraTest.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
+    <ClCompile Include="Goal.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Target.cpp" />
     <ClCompile Include="Tutorial07.cpp" />
@@ -413,6 +414,7 @@
     <ClInclude Include="BoundingSphere.h" />
     <ClInclude Include="CameraTest.h" />
     <ClInclude Include="DDSTextureLoader.h" />
+    <ClInclude Include="Goal.h" />
     <ClInclude Include="GUtility.h" />
     <ClInclude Include="Object.h" />
     <CLInclude Include="resource.h" />

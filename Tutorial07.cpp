@@ -34,10 +34,13 @@
 //}
 #define RenderSelector true
 #define SelectorDistance 5.0f
-#define speed -0.25f
+#define speed -0.15f
 #define FPS 60
 #define targetDelta (1000/FPS)
 #define MouseSensitivity 0.035f
+
+#define WindowWidth 800
+#define WindowHeight 600
 float currentDelta = 0.0f;
 float ScaleFactor = 0.0f;
 float frameEnd = 0.0f;
@@ -190,7 +193,7 @@ HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow)
 
 	// Create window
 	g_hInst = hInstance;
-	RECT rc = { 0, 0, 800, 600 };
+	RECT rc = { 0, 0, WindowWidth, WindowHeight };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 	g_hWnd = CreateWindow(L"TutorialWindowClass", L"Direct3D 11 Tutorial 7",
 		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
@@ -976,9 +979,9 @@ void Render()
 		once = true;
 	}
 	// Modify the color
-	g_vMeshColor.x = (sinf(t * 1.0f) + 1.0f) * 0.5f;
-	g_vMeshColor.y = (cosf(t * 3.0f) + 1.0f) * 0.5f;
-	g_vMeshColor.z = (sinf(t * 5.0f) + 1.0f) * 0.5f;
+	//g_vMeshColor.x = (sinf(t * 1.0f) + 1.0f) * 0.5f;
+	//g_vMeshColor.y = (cosf(t * 3.0f) + 1.0f) * 0.5f;
+	//g_vMeshColor.z = (sinf(t * 5.0f) + 1.0f) * 0.5f;
 
 	//
 	// Clear the back buffer
@@ -1013,7 +1016,10 @@ void Render()
 	if (RenderSelector == true)
 	{
 		XMVECTOR SelectorMatrix = XMLoadFloat3(&Selector.GetPos()); //Get the Matrix of the selector cube and feed this into G world
-		g_World = XMMatrixTranslationFromVector(SelectorMatrix);
+		Selector.SetRotation(XMFLOAT3(0, t, 0));
+		g_World = XMMatrixRotationY(Selector.GetRotation().y);
+		g_World *= XMMatrixTranslationFromVector(SelectorMatrix);
+		//g_World *= Selector.GetRotationMatrix();
 		CBChangesEveryFrame cb; //Create a constant buffer to be sent to the shader file
 		cb.mWorld = XMMatrixTranspose(g_World); //Set the Constant Buffer's world position
 		cb.vMeshColor = g_vMeshColor;  //Set the colour of the object

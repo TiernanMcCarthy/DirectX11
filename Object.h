@@ -20,6 +20,10 @@ public:
 
 	void SetTexture(wchar_t Name[40], ID3D11Device* g_pd3dDevice);
 	void SetTexture(ID3D11ShaderResourceView* local, ID3D11Device* g_pd3dDevice);
+	void SetRotation(XMFLOAT3 t);
+	//Return Rotation as XMFLOAT3
+	XMFLOAT3 GetRotation();
+	XMMATRIX GetRotationMatrix();
 	ID3D11ShaderResourceView* Texture();
 	//Bounding Box
 	float maxX;
@@ -31,6 +35,8 @@ public:
 	AABB box = AABB(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1)); //AABB box temporarily public for testing
 private:
 	XMFLOAT3 pos; //Position of the object. Position can be accessed by a get position function
+	XMFLOAT3 rot; //Rotation of the object. Accessed through get and set functions
+	XMMATRIX RotationMatrix;
 	bool active;
 	bool bounding;
 	ID3D11ShaderResourceView* g_pTextureRV = nullptr;
