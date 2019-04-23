@@ -34,9 +34,18 @@
 //}
 #define RenderSelector true
 #define SelectorDistance 5.0f
-#define speed 0.0005f
+#define speed -0.25f
+#define FPS 60
+#define targetDelta (1000/FPS)
+#define MouseSensitivity 0.035f
+float currentDelta = 0.0f;
+float ScaleFactor = 0.0f;
+float frameEnd = 0.0f;
 
+float timeLast = 0;
 using namespace DirectX;
+
+
 
 //--------------------------------------------------------------------------------------
 // Structures
@@ -111,6 +120,7 @@ void Render();
 // Entry point to the program. Initializes everything and goes into a message processing 
 // loop. Idle time is used to render the scene.
 //--------------------------------------------------------------------------------------
+DWORD currentTime = timeGetTime();
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
@@ -137,6 +147,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		else
 		{
 			Render();
+			currentTime = timeGetTime();
+			if ((currentTime-timeLast)<(1000/FPS))
+			{
+				Sleep(currentTime - timeLast);
+			}
+			timeLast = currentTime;
+			frameEnd = timeGetTime();
+			currentDelta = (currentTime - frameEnd);
+			ScaleFactor = (currentDelta / targetDelta);
 		}
 
 	}
@@ -758,27 +777,22 @@ public:
 
 void MouseMovement()
 {
-	float temp = currentX / previousX;
-	//CamBhoy.Rotate(0, 0.00003f*temp, 0);
 	if (currentX < previousX)
 	{
-		CamBhoy.Rotate(0, -currentX * 0.00005f, 0);
+		CamBhoy.Rotate(0, -MouseSensitivity, 0);
 	}
 	else if (currentX > previousX)
 	{
-		CamBhoy.Rotate(0, currentX*0.00005f, 0);
+		CamBhoy.Rotate(0, MouseSensitivity, 0);
 	}
 	if (currentY < previousY)
 	{
-		CamBhoy.Rotate(-currentY * 0.00005f, 0, 0);
+		CamBhoy.Rotate(-MouseSensitivity, 0, 0);
 	}
 	else if (currentY > previousY)
 	{
-		CamBhoy.Rotate(currentY*0.00005f, 0, 0);
+		CamBhoy.Rotate(MouseSensitivity, 0, 0);
 	}
-	//SetCursorPos(rc.right / 2, rc.bottom / 2);
-	//SetPhysicalCursorPos(rc.right / 2, rc.bottom / 2);
-	//CamBhoy.SetRotation()
 }
 bool once = false;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -851,12 +865,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_MOUSEMOVE:
 		//PostQuitMessage(0);
-		MouseMovement();
 		//ClipCursor(&sizey);
 		previousX = currentX;//Replace the old previous
 		currentX = MAKEPOINTS(lParam).x;//Collect pointer coords?
 		previousY = currentY;
 		currentY = MAKEPOINTS(lParam).y;
+		MouseMovement();
 		break;
 		// Note that this tutorial does not handle resizing (WM_SIZE) requests,
 		// so we created the window without the resize border.
@@ -951,7 +965,7 @@ void Render()
 	temp = ForwardDirection(CamBhoy.GetRotionFloat3()); //Get the forward direction of the Camera
 	if (vertical == 'u')
 	{
-		CamBhoy.MoveFrom(temp.x*speed, -temp.y*speed, temp.z*speed);
+		CamBhoy.MoveFrom(temp.x*speed*ScaleFactor, -temp.y*speed*ScaleFactor, temp.z*speed*ScaleFactor);
 	}
 	if (vertical == 'd'& once == false)
 	{

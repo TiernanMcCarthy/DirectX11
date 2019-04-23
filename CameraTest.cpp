@@ -84,8 +84,20 @@ void CameraTest::SetRotation(const XMVECTOR & rot)
 
 void CameraTest::Rotate(float x, float y, float z)
 {
-	Rotation.x += x;
 	Rotation.y += y;
+
+	if (Rotation.x> 1.570796f)//Lock the camera from going more than 90 degrees up or down
+	{
+		Rotation.x = 1.570796f;
+	}
+	else if (Rotation.x< -1.570796f)
+	{
+		Rotation.x = -1.570796f;
+	}
+	else
+	{
+		Rotation.x += x;
+	}
 	Rotation.z += z;
 	this->UpdateViewMatrix();
 }

@@ -31,6 +31,7 @@
     <ClCompile Include="BoundingSphere.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Target.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tutorial07.cpp" />
@@ -55,6 +56,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="BoundingSphere.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Target.h">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
