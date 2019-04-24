@@ -88,8 +88,14 @@ void Object::SetTexture(ID3D11ShaderResourceView* local, ID3D11Device* g_pd3dDev
 void Object::SetRotation(XMFLOAT3 t)
 {
 	rot = t;
-	RotationMatrix = XMMatrixRotationY(t.y);
+	RotationMatrix = XMMatrixRotationRollPitchYaw(t.x, t.y, t.z);
 }
+void Object::Rotate(XMFLOAT3 t)
+{
+	rot = XMFLOAT3(rot.x+t.x, rot.y+t.y, rot.z+t.z);
+	RotationMatrix = XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
+}
+
 //Return Rotation as XMFLOAT3
 XMFLOAT3 Object::GetRotation() 
 {

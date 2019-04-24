@@ -21,6 +21,7 @@ public:
 	void SetTexture(wchar_t Name[40], ID3D11Device* g_pd3dDevice);
 	void SetTexture(ID3D11ShaderResourceView* local, ID3D11Device* g_pd3dDevice);
 	void SetRotation(XMFLOAT3 t);
+	void Rotate(XMFLOAT3 t);
 	//Return Rotation as XMFLOAT3
 	XMFLOAT3 GetRotation();
 	XMMATRIX GetRotationMatrix();

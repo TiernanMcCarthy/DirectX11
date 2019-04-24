@@ -26,6 +26,8 @@
 #include "VectorMaths.h"
 #include <functional> 
 #include <vector>
+#include "Target.h"
+#include <string>
 //const float pi = 3.14159265359f;
 //float DegtoRag(float v)
 //{
@@ -245,7 +247,7 @@ HRESULT CompileShaderFromFile(const WCHAR* szFileName, LPCSTR szEntryPoint, LPCS
 
 	return S_OK;
 }
-
+ID3D11ShaderResourceView* Wood;
 
 //--------------------------------------------------------------------------------------
 // Create Direct3D device and swap chain
@@ -602,7 +604,7 @@ HRESULT InitDevice()
 	hr = g_pd3dDevice->CreateSamplerState(&sampDesc, &g_pSamplerLinear);
 	if (FAILED(hr))
 		return hr;
-
+	CreateDDSTextureFromFile(g_pd3dDevice, L"CustomWood.dds", nullptr, &Wood);
 	// Initialize the world matrices
 	g_World = XMMatrixIdentity();
 
@@ -669,7 +671,6 @@ float previousY;
 float currentY;
 bool rotating = true;
 CameraTest CamBhoy;
-
 std::vector<Object*> CreateRow(int length, int row)
 {
 	std::vector<Object*> Floor;
@@ -678,6 +679,7 @@ std::vector<Object*> CreateRow(int length, int row)
 	{
 		temp = new Object;
 		temp->SetPos(XMFLOAT3(i * 2, 0, row * 2));
+		temp->SetTexture(Wood, g_pd3dDevice);
 		Floor.push_back(temp);
 	}
 	delete temp;
@@ -756,6 +758,10 @@ public:
 	//	temp->SetPos(tempos);
 	//	delete temp;
 		//temp = NULL;
+	}
+	Room()
+	{
+
 	}
 };
 
@@ -927,6 +933,41 @@ Object Selector = Object(XMFLOAT3(0, 0, 0), true);
 Room bob(5, 5, 5);
 ID3D11ShaderResourceView* Animate[4];
 int animy = 0;
+Target testyy;
+
+ID3D11ShaderResourceView* Goals[13];
+wchar_t Name[40] = L"Goal1";
+void createTexture()
+{
+	for (int i = 0; i <= 13; i++)
+	{
+		Name[4] = char(i);
+	   CreateDDSTextureFromFile(g_pd3dDevice, L"Test.dds", nullptr, &Goals[i]);
+	}
+}
+struct Scene
+{
+	//Process the Selector, Map Geometry , Target and Goal are all defined inside this structure and 
+	Object *Selector = new Object;
+	Target *TargetObject = new Target;
+	Room *RoomObject = new Room;
+
+	Scene()
+	{
+		 *RoomObject=Room(5, 5, 5);
+		 *Selector = Object(XMFLOAT3(0, 0, 0), true);
+		 Selector->SetTexture(Animate[0], g_pd3dDevice); //Set a texture for the Selector In case I wish to debug it
+		 *TargetObject = Target(XMFLOAT3(0,0,0));
+
+	}
+
+
+	void Process()
+	{
+
+	}
+
+};
 void Render()
 {
 	// Update our time
@@ -936,10 +977,11 @@ void Render()
 		legitonce = false;
 		CreateDDSTextureFromFile(g_pd3dDevice, L"Test.dds", nullptr, &Animate[0]);
 		CreateDDSTextureFromFile(g_pd3dDevice, L"Test1.dds", nullptr, &Animate[1]);
-		CreateDDSTextureFromFile(g_pd3dDevice, L"Test2.dds", nullptr, &Animate[2]);
-		CreateDDSTextureFromFile(g_pd3dDevice, L"Test3.dds", nullptr, &Animate[3]);
+		CreateDDSTextureFromFile(g_pd3dDevice, L"goal1.dds", nullptr, &Animate[2]);
+		CreateDDSTextureFromFile(g_pd3dDevice, L"goal1.dds", nullptr, &Animate[3]);
 		wchar_t Name[40] = L"Test.dds";
 		Selector.SetTexture(Name, g_pd3dDevice);
+		test.SetPos(3, 3, 3);
 	}
 	static float t = 0.0f;
 	if (g_driverType == D3D_DRIVER_TYPE_REFERENCE)
@@ -1012,13 +1054,43 @@ void Render()
 	{
 		ObjectList[3].SetPos(CamBhoy.GetPos() + XMFLOAT3(temp.x, -temp.y, temp.z) * 5);
 	}
+
+
+	testyy.Update();
+	XMVECTOR asaw = XMLoadFloat3(&test.GetPos()); //Get the Matrix of the selector cube and feed this into G world
+	//test.SetRotation(XMFLOAT3(0, t, 0));
+	
+	//g_World = XMMatrixRotationY(Selector.GetRotation().y);
+	g_World = XMMatrixTranslationFromVector(asaw);
+	//g_World *= Selector.GetRotationMatrix();
+	CBChangesEveryFrame cb; //Create a constant buffer to be sent to the shader file
+	cb.mWorld = XMMatrixTranspose(g_World); //Set the Constant Buffer's world position
+	cb.vMeshColor = g_vMeshColor;  //Set the colour of the object
+	cb.view2 = XMMatrixTranspose(CamBhoy.GetViewMatrix()); //Set the view matrix to that of the camera class
+	g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0); //Start applying rendering settings to be sent to the shader file through the changing constant buffer
+
+	//
+	// Render the cube
+	//
+	Selector.SetTexture(Animate[animy], g_pd3dDevice);
+	ID3D11ShaderResourceView*           tempy = Selector.Texture();
+	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
+	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBNeverChanges);
+	g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
+	g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
+	g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
+	g_pImmediateContext->PSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
+	g_pImmediateContext->PSSetShaderResources(0, 1, &tempy);
+	g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
+	g_pImmediateContext->DrawIndexed(36, 0, 0);
+
 	// Code for rendering the Selector Cube
 	if (RenderSelector == true)
 	{
 		XMVECTOR SelectorMatrix = XMLoadFloat3(&Selector.GetPos()); //Get the Matrix of the selector cube and feed this into G world
 		Selector.SetRotation(XMFLOAT3(0, t, 0));
-		g_World = XMMatrixRotationY(Selector.GetRotation().y);
-		g_World *= XMMatrixTranslationFromVector(SelectorMatrix);
+		//g_World = XMMatrixRotationY(Selector.GetRotation().y);
+		g_World = XMMatrixTranslationFromVector(SelectorMatrix);
 		//g_World *= Selector.GetRotationMatrix();
 		CBChangesEveryFrame cb; //Create a constant buffer to be sent to the shader file
 		cb.mWorld = XMMatrixTranspose(g_World); //Set the Constant Buffer's world position
@@ -1070,6 +1142,7 @@ void Render()
 	{
 		XMVECTOR MatrixPosition = XMLoadFloat3(&bob.Floor[i]->GetPos()); //Get the position of Object[i] and feed this into a Matrix
 		g_World = XMMatrixTranslationFromVector(MatrixPosition); //Set the world position for feeding into a constant buffer
+		ID3D11ShaderResourceView*           tempy =bob.Floor[i]->Texture();
 		CBChangesEveryFrame cb; //Create a constant buffer
 		cb.mWorld = XMMatrixTranspose(g_World); //Set this Position 
 		cb.vMeshColor = g_vMeshColor; //Apply the colour as three floats 
@@ -1084,7 +1157,7 @@ void Render()
 		g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
 		g_pImmediateContext->PSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
-		g_pImmediateContext->PSSetShaderResources(0, 1, &g_pTextureRV);
+		g_pImmediateContext->PSSetShaderResources(0, 1, &Wood);
 		g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
 	}
