@@ -936,15 +936,41 @@ int animy = 0;
 Target testyy;
 
 ID3D11ShaderResourceView* Goals[13];
-wchar_t Name[40] = L"Goal1";
-void createTexture()
+wchar_t Name[40] = L"goal1";
+void createTexture() //This function will add a number on the end of the suffix you supply it
 {
-	for (int i = 0; i <= 13; i++)
+	char *local= new char;
+	for (int i = 0; i < 10; i++)
 	{
-		Name[4] = char(i);
-	   CreateDDSTextureFromFile(g_pd3dDevice, L"Test.dds", nullptr, &Goals[i]);
+	   itoa(i, local, 10);
+	   Name[4] = local[0];
+	   CreateDDSTextureFromFile(g_pd3dDevice, Name, nullptr, &Goals[i]);
+	   local = new char;
 	}
+	delete local;
+	local = NULL;
 }
+
+void createTexture(short numberoftextures,std::string name) //This function will add a number on the end of the suffix you supply it
+{
+	wchar_t** arr = new wchar_t*[name.size()];
+	char* local = new char;
+	for (int i = 0; i < numberoftextures; i++)
+	{
+		itoa(i, local, 10);
+		Name[4] = local[0];
+		CreateDDSTextureFromFile(g_pd3dDevice, L"Test.dds", nullptr, &Goals[i]);
+	}
+
+	for (int i = 0; i < numberoftextures; i++)
+	{
+		delete[] arr[i];
+		arr[i] = NULL;
+	}
+	delete local;
+	local = NULL;
+}
+
 struct Scene
 {
 	//Process the Selector, Map Geometry , Target and Goal are all defined inside this structure and 
@@ -975,13 +1001,15 @@ void Render()
 	{
 		ObjectList[3].SetPos(XMFLOAT3(6, 7, 0));
 		legitonce = false;
-		CreateDDSTextureFromFile(g_pd3dDevice, L"Test.dds", nullptr, &Animate[0]);
-		CreateDDSTextureFromFile(g_pd3dDevice, L"Test1.dds", nullptr, &Animate[1]);
-		CreateDDSTextureFromFile(g_pd3dDevice, L"goal1.dds", nullptr, &Animate[2]);
-		CreateDDSTextureFromFile(g_pd3dDevice, L"goal1.dds", nullptr, &Animate[3]);
+		createTexture(4, "Test1.dds");
+	//	CreateDDSTextureFromFile(g_pd3dDevice, L"Test.dds", nullptr, &Animate[0]);
+	//	CreateDDSTextureFromFile(g_pd3dDevice, L"Test1.dds", nullptr, &Animate[1]);
+	//	CreateDDSTextureFromFile(g_pd3dDevice, L"goal1.dds", nullptr, &Animate[2]);
+	//	CreateDDSTextureFromFile(g_pd3dDevice, L"goal1.dds", nullptr, &Animate[3]);
 		wchar_t Name[40] = L"Test.dds";
 		Selector.SetTexture(Name, g_pd3dDevice);
 		test.SetPos(3, 3, 3);
+		createTexture();
 	}
 	static float t = 0.0f;
 	if (g_driverType == D3D_DRIVER_TYPE_REFERENCE)

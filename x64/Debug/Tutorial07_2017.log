@@ -1,32 +1,3 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Tutorial04.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Tutorial07.cpp
-f:\more bloody directx11\directx11\cameratest.h(36): warning C4324: 'CameraTest': structure was padded due to alignment specifier
-f:\more bloody directx11\directx11\tutorial07.cpp(158): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
-f:\more bloody directx11\directx11\tutorial07.cpp(160): warning C4244: '=': conversion from 'DWORD' to 'float', possible loss of data
-f:\more bloody directx11\directx11\tutorial07.cpp(161): warning C4244: '=': conversion from 'DWORD' to 'float', possible loss of data
-f:\more bloody directx11\directx11\tutorial07.cpp(681): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-f:\more bloody directx11\directx11\tutorial07.cpp(696): warning C4100: 'height': unreferenced formal parameter
-f:\more bloody directx11\directx11\tutorial07.cpp(922): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-f:\more bloody directx11\directx11\tutorial07.cpp(917): warning C4189: 'bobly': local variable is initialized but not referenced
-f:\more bloody directx11\directx11\tutorial07.cpp(982): warning C4459: declaration of 'Name' hides global declaration
-  f:\more bloody directx11\directx11\tutorial07.cpp(939): note: see declaration of 'Name'
-f:\more bloody directx11\directx11\tutorial07.cpp(1015): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
-f:\more bloody directx11\directx11\tutorial07.cpp(1019): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-f:\more bloody directx11\directx11\tutorial07.cpp(1060): warning C4238: nonstandard extension used: class rvalue used as lvalue
-f:\more bloody directx11\directx11\tutorial07.cpp(1088): warning C4127: conditional expression is constant
-  f:\more bloody directx11\directx11\tutorial07.cpp(1088): note: consider using 'if constexpr' statement instead
-f:\more bloody directx11\directx11\tutorial07.cpp(1090): warning C4238: nonstandard extension used: class rvalue used as lvalue
-f:\more bloody directx11\directx11\tutorial07.cpp(1095): warning C4456: declaration of 'cb' hides previous local declaration
-  f:\more bloody directx11\directx11\tutorial07.cpp(1066): note: see declaration of 'cb'
-f:\more bloody directx11\directx11\tutorial07.cpp(1105): warning C4456: declaration of 'tempy' hides previous local declaration
-  f:\more bloody directx11\directx11\tutorial07.cpp(1076): note: see declaration of 'tempy'
-f:\more bloody directx11\directx11\tutorial07.cpp(1119): warning C4238: nonstandard extension used: class rvalue used as lvalue
-f:\more bloody directx11\directx11\tutorial07.cpp(1121): warning C4456: declaration of 'cb' hides previous local declaration
-  f:\more bloody directx11\directx11\tutorial07.cpp(1066): note: see declaration of 'cb'
-f:\more bloody directx11\directx11\tutorial07.cpp(1143): warning C4238: nonstandard extension used: class rvalue used as lvalue
-f:\more bloody directx11\directx11\tutorial07.cpp(1145): warning C4456: declaration of 'tempy' hides previous local declaration
-  f:\more bloody directx11\directx11\tutorial07.cpp(1076): note: see declaration of 'tempy'
-f:\more bloody directx11\directx11\tutorial07.cpp(1146): warning C4456: declaration of 'cb' hides previous local declaration
-  f:\more bloody directx11\directx11\tutorial07.cpp(1066): note: see declaration of 'cb'
-f:\more bloody directx11\directx11\tutorial07.cpp(1145): warning C4189: 'tempy': local variable is initialized but not referenced
-  Tutorial07_2017.vcxproj -> F:\More Bloody DirectX11\DirectX11\x64\Debug\Tutorial07.exe
+﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Tutorial04.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  Tutorial07_2017.vcxproj -> E:\DirectX11\x64\Debug\Tutorial07.exe
+  Tutorial07_2017.vcxproj -> E:\DirectX11\x64\Debug\Tutorial07.pdb (Full PDB)
