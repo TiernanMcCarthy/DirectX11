@@ -76,6 +76,11 @@ struct CBChangesEveryFrame
 	XMMATRIX mWorld;
 	XMFLOAT4 vMeshColor;
 	XMMATRIX view2;
+	XMMATRIX mProjection; //Possibly not needed and our view2 matrix;
+	//Lighting variables from tutorial 06
+	XMFLOAT4 vLightDir[2];
+	XMFLOAT4 vLightColor[2];
+	XMFLOAT4 vOutputColor;
 };
 
 
@@ -97,6 +102,7 @@ ID3D11Texture2D*                    g_pDepthStencil = nullptr;
 ID3D11DepthStencilView*             g_pDepthStencilView = nullptr;
 ID3D11VertexShader*                 g_pVertexShader = nullptr;
 ID3D11PixelShader*                  g_pPixelShader = nullptr;
+ID3D11PixelShader*                  g_pPixelShaderSolid = nullptr; //Lighting Shader
 ID3D11InputLayout*                  g_pVertexLayout = nullptr;
 ID3D11Buffer*                       g_pVertexBuffer = nullptr;
 ID3D11Buffer*                       g_pIndexBuffer = nullptr;
@@ -679,7 +685,7 @@ std::vector<Object*> CreateRow(int length, int row)
 	{
 		temp = new Object;
 		temp->SetPos(XMFLOAT3(i * 2, 0, row * 2));
-		temp->SetTexture(Wood, g_pd3dDevice);
+		temp->SetTexture(Wood);
 		Floor.push_back(temp);
 	}
 	delete temp;
@@ -935,31 +941,32 @@ ID3D11ShaderResourceView* Animate[4];
 int animy = 0;
 Target testyy;
 
-ID3D11ShaderResourceView* Goals[13];
-wchar_t Name[40] = L"goal1";
+ID3D11ShaderResourceView* Goals[10];
+wchar_t Dontreusevariablenamesidiot[40] = L"goal01.dds";
 void createTexture() //This function will add a number on the end of the suffix you supply it
 {
 	char *local= new char;
 	for (int i = 0; i < 10; i++)
 	{
 	   itoa(i, local, 10);
-	   Name[4] = local[0];
-	   CreateDDSTextureFromFile(g_pd3dDevice, Name, nullptr, &Goals[i]);
+	   Dontreusevariablenamesidiot[4] = local[0];
+	   CreateDDSTextureFromFile(g_pd3dDevice, Dontreusevariablenamesidiot, nullptr, &Goals[i]);
 	   local = new char;
 	}
 	delete local;
 	local = NULL;
 }
-
-void createTexture(short numberoftextures,std::string name) //This function will add a number on the end of the suffix you supply it
+std::vector<ID3D11ShaderResourceView*> texturelist;
+/*void createTexture(short numberoftextures,std::string name) //This function will add a number on the end of the suffix you supply it
 {
-	wchar_t** arr = new wchar_t*[name.size()];
+	const int size = name.size();
+	wchar_t** arr = new wchar_t*[size];
 	char* local = new char;
 	for (int i = 0; i < numberoftextures; i++)
 	{
 		itoa(i, local, 10);
-		Name[4] = local[0];
-		CreateDDSTextureFromFile(g_pd3dDevice, L"Test.dds", nullptr, &Goals[i]);
+		Dontreusevariablenamesidiot[4] = local[0];
+		CreateDDSTextureFromFile(g_pd3dDevice, Dontreusevariablenamesidiot, nullptr, &Goals[i]);
 	}
 
 	for (int i = 0; i < numberoftextures; i++)
@@ -969,7 +976,49 @@ void createTexture(short numberoftextures,std::string name) //This function will
 	}
 	delete local;
 	local = NULL;
+}*/
+
+
+
+
+
+void createTexture(short numberoftextures)
+{
+	
+	char *end = new char;
+	char *large = new char;
+	//Used to store up to 100 textures for an object e.g. 0-99. 
+	int first=0;
+	int second = 0;
+
+	for (int i = 0; i < numberoftextures; i++)
+	{
+		ID3D11ShaderResourceView* LocalTexture; //Create a texture to append to the list;
+		itoa(first, end, 10); //Assign i's number as its ascii equivalanet
+		Dontreusevariablenamesidiot[5] = end[0]; //Derefrence the pointer and set the texture name's last number
+		CreateDDSTextureFromFile(g_pd3dDevice, Dontreusevariablenamesidiot, nullptr, &LocalTexture); //Create a texture from these details
+		texturelist.push_back(LocalTexture); //Push this into the vector that contains this texture
+		end = new char;
+		large = new char;
+		if (first<9)
+		{
+			first++;
+		}
+		else
+		{
+			second++;
+			itoa(second, large, 10); //Assign i's number as its ascii equivalanet
+			Dontreusevariablenamesidiot[4] = large[0];
+			first = 0;
+		}
+	}
+	delete end; //Clear the pointer for use
+	end = NULL;
+	delete large; //Clear the pointer for use
+	large = NULL;
 }
+
+
 
 struct Scene
 {
@@ -982,7 +1031,7 @@ struct Scene
 	{
 		 *RoomObject=Room(5, 5, 5);
 		 *Selector = Object(XMFLOAT3(0, 0, 0), true);
-		 Selector->SetTexture(Animate[0], g_pd3dDevice); //Set a texture for the Selector In case I wish to debug it
+		 Selector->SetTexture(Animate[0]); //Set a texture for the Selector In case I wish to debug it
 		 *TargetObject = Target(XMFLOAT3(0,0,0));
 
 	}
@@ -994,6 +1043,7 @@ struct Scene
 	}
 
 };
+int animy2 = 0;
 void Render()
 {
 	// Update our time
@@ -1001,15 +1051,16 @@ void Render()
 	{
 		ObjectList[3].SetPos(XMFLOAT3(6, 7, 0));
 		legitonce = false;
-		createTexture(4, "Test1.dds");
+		//createTexture(4, "goal1.dds");
+		createTexture(29);
 	//	CreateDDSTextureFromFile(g_pd3dDevice, L"Test.dds", nullptr, &Animate[0]);
 	//	CreateDDSTextureFromFile(g_pd3dDevice, L"Test1.dds", nullptr, &Animate[1]);
 	//	CreateDDSTextureFromFile(g_pd3dDevice, L"goal1.dds", nullptr, &Animate[2]);
 	//	CreateDDSTextureFromFile(g_pd3dDevice, L"goal1.dds", nullptr, &Animate[3]);
 		wchar_t Name[40] = L"Test.dds";
-		Selector.SetTexture(Name, g_pd3dDevice);
+		//Selector.SetTexture(Name, g_pd3dDevice);
 		test.SetPos(3, 3, 3);
-		createTexture();
+		//createTexture();
 	}
 	static float t = 0.0f;
 	if (g_driverType == D3D_DRIVER_TYPE_REFERENCE)
@@ -1053,6 +1104,37 @@ void Render()
 	//g_vMeshColor.y = (cosf(t * 3.0f) + 1.0f) * 0.5f;
 	//g_vMeshColor.z = (sinf(t * 5.0f) + 1.0f) * 0.5f;
 
+
+	// Setup our lighting parameters
+	XMFLOAT4 vLightDirs[2] =
+	{
+		XMFLOAT4(-0.577f, 0.577f, -0.577f, 1.0f),
+		XMFLOAT4(0.0f, 0.0f, -1.0f, 1.0f),
+	};
+	XMFLOAT4 vLightColors[2] =
+	{
+		XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f),
+		XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f)
+	};
+
+	// Rotate the second light around the origin
+	XMMATRIX mRotate = XMMatrixRotationY(-2.0f * t);
+	XMVECTOR vLightDir = XMLoadFloat4(&vLightDirs[1]);
+	vLightDir = XMVector3Transform(vLightDir, mRotate);
+	XMStoreFloat4(&vLightDirs[1], vLightDir);
+
+
+
+
+
+
+
+
+
+
+
+
+
 	//
 	// Clear the back buffer
 	//
@@ -1095,12 +1177,21 @@ void Render()
 	cb.mWorld = XMMatrixTranspose(g_World); //Set the Constant Buffer's world position
 	cb.vMeshColor = g_vMeshColor;  //Set the colour of the object
 	cb.view2 = XMMatrixTranspose(CamBhoy.GetViewMatrix()); //Set the view matrix to that of the camera class
+	cb.vLightDir[0] = vLightDirs[0];
+	cb.vLightDir[1] = vLightDirs[1];
+	cb.vLightColor[0] = vLightColors[0];
+	cb.vLightColor[1] = vLightColors[1];
+	cb.vOutputColor = XMFLOAT4(0, 0, 0, 0);
+	
+	
 	g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0); //Start applying rendering settings to be sent to the shader file through the changing constant buffer
 
 	//
 	// Render the cube
 	//
-	Selector.SetTexture(Animate[animy], g_pd3dDevice);
+	//Selector.SetTexture(Animate[animy], g_pd3dDevice);
+
+    Selector.SetTexture(texturelist[animy]);
 	ID3D11ShaderResourceView*           tempy = Selector.Texture();
 	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
 	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBNeverChanges);
@@ -1129,7 +1220,7 @@ void Render()
 		//
 		// Render the cube
 		//
-		Selector.SetTexture(Animate[animy], g_pd3dDevice);
+		//Selector.SetTexture(Animate[animy]);
 		ID3D11ShaderResourceView*           tempy = Selector.Texture();
 		g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
 		g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBNeverChanges);
@@ -1189,7 +1280,25 @@ void Render()
 		g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
 	}
-	if (animy<3)
+
+	for (int m = 0; m < 2; m++)
+	{
+		XMMATRIX mLight = XMMatrixTranslationFromVector(5.0f * XMLoadFloat4(&vLightDirs[m]));
+		XMMATRIX mLightScale = XMMatrixScaling(0.2f, 0.2f, 0.2f);
+		mLight = mLightScale * mLight;
+
+		// Update the world variable to reflect the current light
+		cb.mWorld = XMMatrixTranspose(mLight);
+		cb.vOutputColor = vLightColors[m];
+		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0);
+		// g_pPixelShaderSolid
+		g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
+		g_pImmediateContext->DrawIndexed(36, 0, 0);
+	}
+
+
+
+	if (animy<28)
 	{
 		animy++;
 	}

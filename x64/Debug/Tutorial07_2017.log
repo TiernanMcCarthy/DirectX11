@@ -1,3 +1,36 @@
-﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Tutorial04.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Tutorial07_2017.vcxproj -> E:\DirectX11\x64\Debug\Tutorial07.exe
-  Tutorial07_2017.vcxproj -> E:\DirectX11\x64\Debug\Tutorial07.pdb (Full PDB)
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Tutorial04.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  Tutorial07.cpp
+f:\more bloody directx11\directx11\cameratest.h(36): warning C4324: 'CameraTest': structure was padded due to alignment specifier
+f:\more bloody directx11\directx11\tutorial07.cpp(164): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+f:\more bloody directx11\directx11\tutorial07.cpp(166): warning C4244: '=': conversion from 'DWORD' to 'float', possible loss of data
+f:\more bloody directx11\directx11\tutorial07.cpp(167): warning C4244: '=': conversion from 'DWORD' to 'float', possible loss of data
+f:\more bloody directx11\directx11\tutorial07.cpp(687): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+f:\more bloody directx11\directx11\tutorial07.cpp(702): warning C4100: 'height': unreferenced formal parameter
+f:\more bloody directx11\directx11\tutorial07.cpp(928): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+f:\more bloody directx11\directx11\tutorial07.cpp(923): warning C4189: 'bobly': local variable is initialized but not referenced
+f:\more bloody directx11\directx11\tutorial07.cpp(951): warning C4996: 'itoa': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _itoa. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1323): note: see declaration of 'itoa'
+f:\more bloody directx11\directx11\tutorial07.cpp(997): warning C4996: 'itoa': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _itoa. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1323): note: see declaration of 'itoa'
+f:\more bloody directx11\directx11\tutorial07.cpp(1010): warning C4996: 'itoa': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _itoa. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1323): note: see declaration of 'itoa'
+f:\more bloody directx11\directx11\tutorial07.cpp(1094): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+f:\more bloody directx11\directx11\tutorial07.cpp(1098): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+f:\more bloody directx11\directx11\tutorial07.cpp(1170): warning C4238: nonstandard extension used: class rvalue used as lvalue
+f:\more bloody directx11\directx11\tutorial07.cpp(1207): warning C4127: conditional expression is constant
+  f:\more bloody directx11\directx11\tutorial07.cpp(1207): note: consider using 'if constexpr' statement instead
+f:\more bloody directx11\directx11\tutorial07.cpp(1209): warning C4238: nonstandard extension used: class rvalue used as lvalue
+f:\more bloody directx11\directx11\tutorial07.cpp(1214): warning C4456: declaration of 'cb' hides previous local declaration
+  f:\more bloody directx11\directx11\tutorial07.cpp(1176): note: see declaration of 'cb'
+f:\more bloody directx11\directx11\tutorial07.cpp(1224): warning C4456: declaration of 'tempy' hides previous local declaration
+  f:\more bloody directx11\directx11\tutorial07.cpp(1195): note: see declaration of 'tempy'
+f:\more bloody directx11\directx11\tutorial07.cpp(1238): warning C4238: nonstandard extension used: class rvalue used as lvalue
+f:\more bloody directx11\directx11\tutorial07.cpp(1240): warning C4456: declaration of 'cb' hides previous local declaration
+  f:\more bloody directx11\directx11\tutorial07.cpp(1176): note: see declaration of 'cb'
+f:\more bloody directx11\directx11\tutorial07.cpp(1262): warning C4238: nonstandard extension used: class rvalue used as lvalue
+f:\more bloody directx11\directx11\tutorial07.cpp(1264): warning C4456: declaration of 'tempy' hides previous local declaration
+  f:\more bloody directx11\directx11\tutorial07.cpp(1195): note: see declaration of 'tempy'
+f:\more bloody directx11\directx11\tutorial07.cpp(1265): warning C4456: declaration of 'cb' hides previous local declaration
+  f:\more bloody directx11\directx11\tutorial07.cpp(1176): note: see declaration of 'cb'
+f:\more bloody directx11\directx11\tutorial07.cpp(1264): warning C4189: 'tempy': local variable is initialized but not referenced
+  Tutorial07_2017.vcxproj -> F:\More Bloody DirectX11\DirectX11\x64\Debug\Tutorial07.exe
