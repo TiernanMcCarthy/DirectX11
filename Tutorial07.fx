@@ -25,6 +25,10 @@ cbuffer cbChangesEveryFrame : register( b2 )
     matrix World;
     float4 vMeshColor;
 	matrix View2;
+	float4 vLightDir[2]; //Addition of lighting variables from tutorial 06
+	float4 vLightColor[2];
+	float4 vOutputColor;
+	matrix Projection2;
 };
 
 
@@ -33,12 +37,14 @@ struct VS_INPUT
 {
     float4 Pos : POSITION;
     float2 Tex : TEXCOORD0;
+	float3 Norm: NORMAL;
 };
 
 struct PS_INPUT
 {
     float4 Pos : SV_POSITION;
     float2 Tex : TEXCOORD0;
+	float3 Norm: TEXCOORD1;
 };
 
 
@@ -52,7 +58,8 @@ PS_INPUT VS( VS_INPUT input )
     output.Pos = mul( output.Pos, View2 );
     output.Pos = mul( output.Pos, Projection );
     output.Tex = input.Tex;
-    
+	output.Norm = mul(float4(input.Norm, 1), World).xyz;
+
     return output;
 }
 
@@ -60,7 +67,23 @@ PS_INPUT VS( VS_INPUT input )
 //--------------------------------------------------------------------------------------
 // Pixel Shader
 //--------------------------------------------------------------------------------------
-float4 PS( PS_INPUT input) : SV_Target
+float4 PS(PS_INPUT input) : SV_Target
 {
-    return txDiffuse.Sample( samLinear, input.Tex ) * vMeshColor;
+	float4 finalColor = 0;
+	float4 vLightColorlocal = float4(0, 0, 1, 0);
+	//do NdotL lighting for 2 lights
+	for (int i = 0; i < 2; i++)
+	{
+		finalColor += saturate(dot((float3)vLightDir[i],input.Norm) * vLightColor[i]);
+	}
+	finalColor.a = 1;
+	//return finalColor;
+    return txDiffuse.Sample( samLinear, input.Tex ) +(finalColor + vMeshColor);
+}
+//--------------------------------------------------------------------------------------
+// PSSolid - render a solid color
+//--------------------------------------------------------------------------------------
+float4 PSSolid(PS_INPUT input) : SV_Target
+{
+	return vOutputColor;
 }

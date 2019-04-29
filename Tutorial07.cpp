@@ -76,7 +76,7 @@ struct CBChangesEveryFrame
 	XMMATRIX mWorld;
 	XMFLOAT4 vMeshColor;
 	XMMATRIX view2;
-	XMMATRIX mProjection; //Possibly not needed and our view2 matrix;
+	XMMATRIX mProjection2; //Possibly not needed and our view2 matrix;
 	//Lighting variables from tutorial 06
 	XMFLOAT4 vLightDir[2];
 	XMFLOAT4 vLightColor[2];
@@ -114,7 +114,8 @@ ID3D11SamplerState*                 g_pSamplerLinear = nullptr;
 XMMATRIX                            g_World;
 XMMATRIX                            g_View;
 XMMATRIX                            g_Projection;
-XMFLOAT4                            g_vMeshColor(0.7f, 0.7f, 0.7f, 1.0f);
+//XMFLOAT4                            g_vMeshColor(0.7f, 0.7f, 0.7f, 1.0f);
+XMFLOAT4 g_vMeshColor(0.15f, 0.15f, 0.15f, 1.0f);
 
 
 //--------------------------------------------------------------------------------------
@@ -455,7 +456,9 @@ HRESULT InitDevice()
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0 , DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	 //Lighting Data sent through to shader file
 	};
 	UINT numElements = ARRAYSIZE(layout);
 
@@ -484,6 +487,24 @@ HRESULT InitDevice()
 	pPSBlob->Release();
 	if (FAILED(hr))
 		return hr;
+
+	// Compile the pixel shader
+	pPSBlob = nullptr;
+	hr = CompileShaderFromFile(L"Tutorial07.fx", "PSSolid", "ps_4_0", &pPSBlob);
+	if (FAILED(hr))
+	{
+		MessageBox(nullptr,
+			L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
+		return hr;
+	}
+
+	// Create the pixel shader
+	hr = g_pd3dDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &g_pPixelShaderSolid);
+	pPSBlob->Release();
+	if (FAILED(hr))
+		return hr;
+
+
 
 	// Create vertex buffer
 	SimpleVertex vertices[] =
@@ -627,9 +648,9 @@ HRESULT InitDevice()
 	// Initialize the projection matrix
 	g_Projection = XMMatrixPerspectiveFovLH(XM_PIDIV4, width / (FLOAT)height, 0.01f, 100.0f);
 
-	CBChangeOnResize cbChangesOnResize;
-	cbChangesOnResize.mProjection = XMMatrixTranspose(g_Projection);
-	g_pImmediateContext->UpdateSubresource(g_pCBChangeOnResize, 0, nullptr, &cbChangesOnResize, 0, 0);
+	CBChangeOnResize yus;
+	yus.mProjection = XMMatrixTranspose(g_Projection);
+	g_pImmediateContext->UpdateSubresource(g_pCBChangeOnResize, 0, nullptr, &yus, 0, 0);
 
 	return S_OK;
 }
@@ -1044,6 +1065,21 @@ struct Scene
 
 };
 int animy2 = 0;
+XMFLOAT4 vLightDirs[2] =
+{
+	XMFLOAT4(0, 2, -0, 1.0f), //Ambient light position
+	XMFLOAT4(3, 0.0f, -0.3f, 1.0f),  //Pointed Light
+};
+XMFLOAT4 vLightColors[2] =
+{
+	XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f), //Ambient Light Colour
+	XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f) //Directed Light Colour
+};
+XMMATRIX mLight;
+XMMATRIX mLightScale;
+XMMATRIX mRotate;
+XMVECTOR vLightDir;
+
 void Render()
 {
 	// Update our time
@@ -1106,27 +1142,23 @@ void Render()
 
 
 	// Setup our lighting parameters
-	XMFLOAT4 vLightDirs[2] =
-	{
-		XMFLOAT4(-0.577f, 0.577f, -0.577f, 1.0f),
-		XMFLOAT4(0.0f, 0.0f, -1.0f, 1.0f),
-	};
-	XMFLOAT4 vLightColors[2] =
-	{
-		XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f),
-		XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f)
-	};
+	//XMFLOAT4 vLightDirs[2] =
+	///{
+	//	XMFLOAT4(0, 2, -0, 1.0f), //Ambient light position
+	//	XMFLOAT4(3, 0.0f, -0.3f, 1.0f),  //Pointed Light
+	//};
+	//XMFLOAT4 vLightColors[2] =
+	//{
+	//	XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f), //Ambient Light Colour
+	//	XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f) //Directed Light Colour
+	//};
 
 	// Rotate the second light around the origin
-	XMMATRIX mRotate = XMMatrixRotationY(-2.0f * t);
-	XMVECTOR vLightDir = XMLoadFloat4(&vLightDirs[1]);
+	mRotate = XMMatrixRotationY(-2.0f * t);
+	vLightDir = XMLoadFloat4(&vLightDirs[1]);
+	//XMVECTOR vLightDir = XMLoadFloat3(&(temp*3));
 	vLightDir = XMVector3Transform(vLightDir, mRotate);
 	XMStoreFloat4(&vLightDirs[1], vLightDir);
-
-
-
-
-
 
 
 
@@ -1175,7 +1207,7 @@ void Render()
 	//g_World *= Selector.GetRotationMatrix();
 	CBChangesEveryFrame cb; //Create a constant buffer to be sent to the shader file
 	cb.mWorld = XMMatrixTranspose(g_World); //Set the Constant Buffer's world position
-	cb.vMeshColor = g_vMeshColor;  //Set the colour of the object
+//	cb.vMeshColor = g_vMeshColor;  //Set the colour of the object
 	cb.view2 = XMMatrixTranspose(CamBhoy.GetViewMatrix()); //Set the view matrix to that of the camera class
 	cb.vLightDir[0] = vLightDirs[0];
 	cb.vLightDir[1] = vLightDirs[1];
@@ -1203,6 +1235,8 @@ void Render()
 	g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
 	g_pImmediateContext->DrawIndexed(36, 0, 0);
 
+
+
 	// Code for rendering the Selector Cube
 	if (RenderSelector == true)
 	{
@@ -1215,6 +1249,13 @@ void Render()
 		cb.mWorld = XMMatrixTranspose(g_World); //Set the Constant Buffer's world position
 		cb.vMeshColor = g_vMeshColor;  //Set the colour of the object
 		cb.view2 = XMMatrixTranspose(CamBhoy.GetViewMatrix()); //Set the view matrix to that of the camera class
+		cb.vLightDir[0] = vLightDirs[0];
+		cb.vLightDir[1] = vLightDirs[1];
+		cb.vLightColor[0] = vLightColors[0];
+		cb.vLightColor[1] = vLightColors[1];
+		cb.vOutputColor = XMFLOAT4(0, 0, 0, 0);
+
+
 		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0); //Start applying rendering settings to be sent to the shader file through the changing constant buffer
 
 		//
@@ -1230,6 +1271,16 @@ void Render()
 		g_pImmediateContext->PSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->PSSetShaderResources(0, 1, &tempy);
 		g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
+		cb.vOutputColor = vLightColors[1];
+		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0);
+		g_pImmediateContext->DrawIndexed(36, 0, 0);
+
+		// Update the world variable to reflect the current light
+		cb.mWorld = XMMatrixTranspose(mLight);
+		cb.vOutputColor = vLightColors[1];
+		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0);
+
+		g_pImmediateContext->PSSetShader(g_pPixelShaderSolid, nullptr, 0);
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
 	}
 
@@ -1241,6 +1292,12 @@ void Render()
 		cb.mWorld = XMMatrixTranspose(g_World); //Set this Position 
 		cb.vMeshColor = g_vMeshColor; //Apply the colour as three floats 
 		cb.view2 = XMMatrixTranspose(CamBhoy.GetViewMatrix()); //Set the view matrix to the Camera's
+		cb.vLightDir[0] = vLightDirs[0];
+		cb.vLightDir[1] = vLightDirs[1];
+		cb.vLightColor[0] = vLightColors[0];
+		cb.vLightColor[1] = vLightColors[1];
+		cb.vOutputColor = XMFLOAT4(0, 0, 0, 0);
+		
 		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0); //Start sending the appropriate settings to the shader 
 		//
 		// Render the cube
@@ -1255,7 +1312,12 @@ void Render()
 		//g_pImmediateContext->PSSetShaderResources(0, 1, &tempy);
 		g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
+
+
 	}
+
+
+
 
 	for (int i = 0; i < bob.Floor.size(); i++)
 	{
@@ -1266,6 +1328,11 @@ void Render()
 		cb.mWorld = XMMatrixTranspose(g_World); //Set this Position 
 		cb.vMeshColor = g_vMeshColor; //Apply the colour as three floats 
 		cb.view2 = XMMatrixTranspose(CamBhoy.GetViewMatrix()); //Set the view matrix to the Camera's
+		cb.vLightDir[0] = vLightDirs[0];
+		cb.vLightDir[1] = vLightDirs[1];
+		cb.vLightColor[0] = vLightColors[0];
+		cb.vLightColor[1] = vLightColors[1];
+		cb.vOutputColor = XMFLOAT4(0, 0, 0, 0);
 		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0); //Start sending the appropriate settings to the shader 
 		//
 		// Render the cube
@@ -1281,21 +1348,58 @@ void Render()
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
 	}
 
+	//for (int m = 0; m < 2; m++)
+//	{
+	//	XMMATRIX mLight = XMMatrixTranslationFromVector(XMLoadFloat4(&vLightDirs[m]));
+	///	XMMATRIX mLightScale = XMMatrixScaling(1, 1, 1);
+	//	mLight = mLightScale * mLight;
+		//XMMATRIX temppppp = XMMatrixTranslationFromVector(XMLoadFloat3(&Selector.GetPos()));
+		// Update the world variable to reflect the current light
+	//	cb.mWorld = XMMatrixTranspose(mLight);
+	//	cb.vOutputColor = vLightColors[m];
+//		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0);
+		// g_pPixelShaderSolid
+	//	g_pImmediateContext->PSSetShader(g_pPixelShaderSolid, nullptr, 0);
+	//	g_pImmediateContext->DrawIndexed(36, 0, 0);
+//	}
+
+		//vLightDirs
+
+	CBChangesEveryFrame cb1;
+	cb1.mWorld = XMMatrixTranspose(g_World);
+	cb1.view2 = XMMatrixTranspose(g_View);
+	cb1.mProjection2 = XMMatrixTranspose(g_Projection);
+	cb1.vLightDir[0] = vLightDirs[0];
+	cb1.vLightDir[1] = vLightDirs[1];
+	cb1.vLightColor[0] = vLightColors[0];
+	cb1.vLightColor[1] = vLightColors[1];
+	cb1.vOutputColor = XMFLOAT4(0, 0, 0, 0);
+	//g_pImmediateContext->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb1, 0, 0);
+
+	//
+	// Render the cube
+	//
+	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
+	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
+	g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
+	g_pImmediateContext->PSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
+	g_pImmediateContext->DrawIndexed(36, 0, 0);
+
+
 	for (int m = 0; m < 2; m++)
 	{
 		XMMATRIX mLight = XMMatrixTranslationFromVector(5.0f * XMLoadFloat4(&vLightDirs[m]));
-		XMMATRIX mLightScale = XMMatrixScaling(0.2f, 0.2f, 0.2f);
+		XMMATRIX mLightScale = XMMatrixScaling(0.3f, 0.3f, 0.3f);
 		mLight = mLightScale * mLight;
 
 		// Update the world variable to reflect the current light
-		cb.mWorld = XMMatrixTranspose(mLight);
-		cb.vOutputColor = vLightColors[m];
-		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0);
-		// g_pPixelShaderSolid
-		g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
+		cb1.mWorld = XMMatrixTranspose(mLight);
+		cb1.vOutputColor = vLightColors[m];
+		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb1, 0, 0);
+
+		g_pImmediateContext->PSSetShader(g_pPixelShaderSolid, nullptr, 0);
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
 	}
-
 
 
 	if (animy<28)
@@ -1307,5 +1411,12 @@ void Render()
 		animy = 0;
 	}
 	g_View = CamBhoy.GetViewMatrix();
+	g_Projection = CamBhoy.GetProjectionMatrix();
+	// Initialize the projection matrix
+	g_Projection = XMMatrixPerspectiveFovLH(XM_PIDIV4, WindowWidth / (FLOAT)WindowHeight, 0.01f, 100.0f);
+
+	CBChangeOnResize yus;
+	yus.mProjection = XMMatrixTranspose(g_Projection);
+	g_pImmediateContext->UpdateSubresource(g_pCBChangeOnResize, 0, nullptr, &yus, 0, 0);
 	g_pSwapChain->Present(0, 0);
 }
