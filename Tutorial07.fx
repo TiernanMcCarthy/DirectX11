@@ -23,12 +23,14 @@ cbuffer cbChangeOnResize : register( b1 )
 cbuffer cbChangesEveryFrame : register( b2 )
 {
     matrix World;
-    float4 vMeshColor;
 	matrix View2;
+	matrix Projection2;
+    float4 vMeshColor;
+
 	float4 vLightDir[2]; //Addition of lighting variables from tutorial 06
 	float4 vLightColor[2];
 	float4 vOutputColor;
-	matrix Projection2;
+
 };
 
 
@@ -76,9 +78,11 @@ float4 PS(PS_INPUT input) : SV_Target
 	{
 		finalColor += saturate(dot((float3)vLightDir[i],input.Norm) * vLightColor[i]);
 	}
+	finalColor += vMeshColor;
 	finalColor.a = 1;
 	//return finalColor;
-    return txDiffuse.Sample( samLinear, input.Tex ) +(finalColor + vMeshColor);
+	//return finalColor;
+    return txDiffuse.Sample( samLinear, input.Tex ) +(finalColor);
 }
 //--------------------------------------------------------------------------------------
 // PSSolid - render a solid color

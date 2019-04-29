@@ -34,7 +34,7 @@
 	//float y = v * pi / 180;
 	//return y;
 //}
-#define RenderSelector true
+#define RenderSelector false
 #define SelectorDistance 5.0f
 #define speed -0.15f
 #define FPS 60
@@ -59,6 +59,7 @@ struct SimpleVertex
 {
 	XMFLOAT3 Pos;
 	XMFLOAT2 Tex;
+	XMFLOAT3 Normal;
 };
 
 struct CBNeverChanges
@@ -74,10 +75,11 @@ struct CBChangeOnResize
 struct CBChangesEveryFrame
 {
 	XMMATRIX mWorld;
-	XMFLOAT4 vMeshColor;
+
 	XMMATRIX view2;
 	XMMATRIX mProjection2; //Possibly not needed and our view2 matrix;
-	//Lighting variables from tutorial 06
+	//Lighting variables from tutorial 06.
+	XMFLOAT4 vMeshColor;
 	XMFLOAT4 vLightDir[2];
 	XMFLOAT4 vLightColor[2];
 	XMFLOAT4 vOutputColor;
@@ -456,8 +458,8 @@ HRESULT InitDevice()
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0 , DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0 , DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	 //Lighting Data sent through to shader file
 	};
 	UINT numElements = ARRAYSIZE(layout);
@@ -509,35 +511,35 @@ HRESULT InitDevice()
 	// Create vertex buffer
 	SimpleVertex vertices[] =
 	{
-		{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f) },
+		{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT2(1.0f, 0.0f),XMFLOAT3(0.0f,1.0f,0.0f) },
+		{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT2(0.0f, 0.0f),XMFLOAT3(0.0f,1.0f,0.0f) },
+		{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f) ,XMFLOAT3(0.0f,1.0f,0.0f)},
+		{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f) ,XMFLOAT3(0.0f,1.0f,0.0f)},
 
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f) },
+		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT2(0.0f, 0.0f) ,XMFLOAT3(0.0f,-1.0f,0.0f)},
+		{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT2(1.0f, 0.0f) ,XMFLOAT3(0.0f,-1.0f,0.0f)},
+		{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f) ,XMFLOAT3(0.0f,-1.0f,0.0f)},
+		{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f) ,XMFLOAT3(0.0f,-1.0f,0.0f)},
 
-		{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f) },
+		{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f),XMFLOAT3(-1.0f,0,0.0f) },
+		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT2(1.0f, 1.0f),XMFLOAT3(-1.0f,0,0.0f) },
+		{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT2(1.0f, 0.0f) ,XMFLOAT3(-1.0f,0,0.0f)},
+		{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f) ,XMFLOAT3(-1.0f,0,0.0f)},
 
-		{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f) },
+		{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f) ,XMFLOAT3(1.0f,0,0.0f)},
+		{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT2(0.0f, 1.0f),XMFLOAT3(1.0f,0,0.0f) },
+		{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT2(0.0f, 0.0f) ,XMFLOAT3(1.0f,0,0.0f)},
+		{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f) ,XMFLOAT3(1.0f,0,0.0f)},
 
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT2(0.0f, 0.0f) },
+		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT2(0.0f, 1.0f),XMFLOAT3(0,0,-1.0f) },
+		{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT2(1.0f, 1.0f) ,XMFLOAT3(0,0,-1.0f)},
+		{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT2(1.0f, 0.0f) ,XMFLOAT3(0,0,-1.0f)},
+		{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT2(0.0f, 0.0f) ,XMFLOAT3(0,0,-1.0f)},
 
-		{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f) },
+		{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT2(1.0f, 1.0f),XMFLOAT3(0,0,1.0f) },
+		{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT2(0.0f, 1.0f),XMFLOAT3(0,0,1.0f) },
+		{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT2(0.0f, 0.0f),XMFLOAT3(0,0,1.0f) },
+		{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT2(1.0f, 0.0f),XMFLOAT3(0,0,1.0f) },
 	};
 
 	D3D11_BUFFER_DESC bd = {};
@@ -1067,14 +1069,15 @@ struct Scene
 int animy2 = 0;
 XMFLOAT4 vLightDirs[2] =
 {
-	XMFLOAT4(0, 2, -0, 1.0f), //Ambient light position
-	XMFLOAT4(3, 0.0f, -0.3f, 1.0f),  //Pointed Light
+	XMFLOAT4(0, 0.577f, 0, 1.0f),
+	XMFLOAT4(1, 0.0f, 0, 1.0f),
 };
 XMFLOAT4 vLightColors[2] =
 {
-	XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f), //Ambient Light Colour
-	XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f) //Directed Light Colour
+	XMFLOAT4(1, 0, 0, 1.0f),
+	XMFLOAT4(0, 0.0f, 1, 1.0f)
 };
+
 XMMATRIX mLight;
 XMMATRIX mLightScale;
 XMMATRIX mRotate;
@@ -1154,7 +1157,7 @@ void Render()
 	//};
 
 	// Rotate the second light around the origin
-	mRotate = XMMatrixRotationY(-2.0f * t);
+	//mRotate = XMMatrixRotationY(-2.0f * t);
 	vLightDir = XMLoadFloat4(&vLightDirs[1]);
 	//XMVECTOR vLightDir = XMLoadFloat3(&(temp*3));
 	vLightDir = XMVector3Transform(vLightDir, mRotate);
@@ -1271,7 +1274,7 @@ void Render()
 		g_pImmediateContext->PSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->PSSetShaderResources(0, 1, &tempy);
 		g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
-		cb.vOutputColor = vLightColors[1];
+		cb.vOutputColor = vLightColors[0];
 		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0);
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
 
