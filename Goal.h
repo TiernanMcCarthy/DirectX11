@@ -5,7 +5,7 @@ class Goal
 {
 public:
 	//Object functions;
-	Object function;
+	Object function = Object(XMFLOAT3(0,0,0));
 	bool GetFinished(); //Used to check if the goal has finished its job.
 	Object SupplyObject();
 

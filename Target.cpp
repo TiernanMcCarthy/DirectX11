@@ -36,9 +36,10 @@ void Target::Dropped()
 
 void Target::Update()// A general function that will run through all the functions of this object.
 {
+	//Spin(0.02f);
 	if (held!=true && finished==false)
 	{
-		Spin(0.02f);
+	//	Spin(0.02f);
 	}
 	else if(held==true)
 	{

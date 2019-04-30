@@ -1,5 +1,40 @@
 ﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Tutorial04.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  compilation object save succeeded; see D:\DirectX11\x64\Debug\Tutorial07_PS.cso
-  compilation object save succeeded; see D:\DirectX11\x64\Debug\Tutorial07_VS.cso
-  Tutorial07_2017.vcxproj -> D:\DirectX11\x64\Debug\Tutorial07.exe
-  Tutorial07_2017.vcxproj -> D:\DirectX11\x64\Debug\Tutorial07.pdb (Full PDB)
+  Tutorial07.cpp
+f:\ubicronic\directx11\CameraTest.h(36): warning C4324: 'CameraTest': structure was padded due to alignment specifier
+Tutorial07.cpp(167): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+Tutorial07.cpp(169): warning C4244: '=': conversion from 'DWORD' to 'float', possible loss of data
+Tutorial07.cpp(170): warning C4244: '=': conversion from 'DWORD' to 'float', possible loss of data
+Tutorial07.cpp(718): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Tutorial07.cpp(733): warning C4100: 'height': unreferenced formal parameter
+Tutorial07.cpp(960): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Tutorial07.cpp(955): warning C4189: 'bobly': local variable is initialized but not referenced
+Tutorial07.cpp(983): warning C4996: 'itoa': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _itoa. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdlib.h(1316): note: see declaration of 'itoa'
+Tutorial07.cpp(1029): warning C4996: 'itoa': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _itoa. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdlib.h(1316): note: see declaration of 'itoa'
+Tutorial07.cpp(1042): warning C4996: 'itoa': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _itoa. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdlib.h(1316): note: see declaration of 'itoa'
+Tutorial07.cpp(1162): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+Tutorial07.cpp(1166): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Tutorial07.cpp(1240): warning C4238: nonstandard extension used: class rvalue used as lvalue
+Tutorial07.cpp(1278): warning C4238: nonstandard extension used: class rvalue used as lvalue
+Tutorial07.cpp(1315): warning C4127: conditional expression is constant
+Tutorial07.cpp(1317): warning C4238: nonstandard extension used: class rvalue used as lvalue
+Tutorial07.cpp(1322): warning C4456: declaration of 'cb' hides previous local declaration
+  Tutorial07.cpp(1246): note: see declaration of 'cb'
+Tutorial07.cpp(1363): warning C4238: nonstandard extension used: class rvalue used as lvalue
+Tutorial07.cpp(1365): warning C4456: declaration of 'cb' hides previous local declaration
+  Tutorial07.cpp(1246): note: see declaration of 'cb'
+Tutorial07.cpp(1396): warning C4238: nonstandard extension used: class rvalue used as lvalue
+Tutorial07.cpp(1429): warning C4238: nonstandard extension used: class rvalue used as lvalue
+Tutorial07.cpp(1431): warning C4456: declaration of 'tempy' hides previous local declaration
+  Tutorial07.cpp(1412): note: see declaration of 'tempy'
+Tutorial07.cpp(1432): warning C4456: declaration of 'cb' hides previous local declaration
+  Tutorial07.cpp(1246): note: see declaration of 'cb'
+Tutorial07.cpp(1496): warning C4459: declaration of 'mLight' hides global declaration
+  Tutorial07.cpp(1081): note: see declaration of 'mLight'
+Tutorial07.cpp(1497): warning C4459: declaration of 'mLightScale' hides global declaration
+  Tutorial07.cpp(1082): note: see declaration of 'mLightScale'
+Tutorial07.cpp(1431): warning C4189: 'tempy': local variable is initialized but not referenced
+  Tutorial07_2017.vcxproj -> F:\UBICRONIC\DirectX11\x64\Debug\Tutorial07.exe
+  Tutorial07_2017.vcxproj -> F:\UBICRONIC\DirectX11\x64\Debug\Tutorial07.pdb (Full PDB)

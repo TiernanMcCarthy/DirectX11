@@ -2,7 +2,7 @@
 #include "Object.h"
 #include "CameraTest.h"
 #include "Goal.h"
-class Target: Object
+class Target:public Object
 {
 public:
 	Target(XMFLOAT3 tempy);
