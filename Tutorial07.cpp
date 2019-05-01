@@ -34,8 +34,8 @@
 	//float y = v * pi / 180;
 	//return y;
 //}
-#define RenderSelector true
-#define SelectorDistance 5.0f
+#define RenderSelector false
+#define SelectorDistance 3.5f
 #define speed -0.15f
 #define FPS 60
 #define targetDelta (1000/FPS)
@@ -1085,7 +1085,7 @@ XMVECTOR vLightDir;
 
 void Reset()
 {
-	TargetObject->SetPos(2, 5, 0); //Set the position of the target object the player must grab
+	TargetObject->SetPos(11, 5, 7); //Set the position of the target object the player must grab
 	TargetObject->SetTexture(TargetTex); //Set the texture of this object to be the correct texture
 	EndGoal->function.SetPos(2, 2, 2); //
 	EndGoal->function.SetTexture(texturelist[0]);
@@ -1240,9 +1240,18 @@ void Render()
 	XMVECTOR PositionMatrix = XMLoadFloat3(&TargetObject->GetPos());
 
 	//g_World = XMMatrixRotationRollPitchYaw(TargetObject->GetRotation().x, TargetObject->GetRotation().y, TargetObject->GetRotation().z);
-	TargetObject->SetRotation(XMFLOAT3(t, t, t));
-	g_World = XMMatrixRotationRollPitchYaw(TargetObject->GetRotation().x, TargetObject->GetRotation().y, TargetObject->GetRotation().z);
-	g_World *= XMMatrixTranslationFromVector(PositionMatrix);
+	if (holding == true)
+	{
+		g_World = XMMatrixTranslationFromVector(PositionMatrix);
+		//TargetObject->SetRotation(XMFLOAT3(0, 0, 0));
+
+	}
+	else
+	{
+		TargetObject->SetRotation(XMFLOAT3(t, t, t));
+		g_World = XMMatrixRotationRollPitchYaw(TargetObject->GetRotation().x, TargetObject->GetRotation().y, TargetObject->GetRotation().z);
+		g_World *= XMMatrixTranslationFromVector(PositionMatrix);
+	}
 	CBChangesEveryFrame cb; //Create a constant buffer to be sent to the shader file
 	cb.mWorld = XMMatrixTranspose(g_World); //Set the Constant Buffer's world position
 	cb.vMeshColor = g_vMeshColor;  //Set the colour of the object
@@ -1394,8 +1403,8 @@ void Render()
 
 	//GoalObject Rendering
 	PositionMatrix = XMLoadFloat3(&ExampleTexturelessBlock.GetPos());
-	g_World= XMMatrixScaling(sinf(t),1,tanf(t));
-	g_World *= XMMatrixRotationRollPitchYaw(-t, -t, t);
+	g_World= XMMatrixScaling(sinf((-t + 0.002f) / 4),1,tanf((t + 0.002f) / 4));
+	g_World *= XMMatrixRotationRollPitchYaw(-t, -t , t);
 	g_World *= XMMatrixTranslationFromVector(PositionMatrix);
 	//cb; //Create a constant buffer to be sent to the shader file
 	cb.mWorld = XMMatrixTranspose(g_World); //Set the Constant Buffer's world position
@@ -1453,22 +1462,7 @@ void Render()
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
 	}
 
-	//for (int m = 0; m < 2; m++)
-//	{
-	//	XMMATRIX mLight = XMMatrixTranslationFromVector(XMLoadFloat4(&vLightDirs[m]));
-	///	XMMATRIX mLightScale = XMMatrixScaling(1, 1, 1);
-	//	mLight = mLightScale * mLight;
-		//XMMATRIX temppppp = XMMatrixTranslationFromVector(XMLoadFloat3(&Selector.GetPos()));
-		// Update the world variable to reflect the current light
-	//	cb.mWorld = XMMatrixTranspose(mLight);
-	//	cb.vOutputColor = vLightColors[m];
-//		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0);
-		// g_pPixelShaderSolid
-	//	g_pImmediateContext->PSSetShader(g_pPixelShaderSolid, nullptr, 0);
-	//	g_pImmediateContext->DrawIndexed(36, 0, 0);
-//	}
 
-		//vLightDirs
 
 	CBChangesEveryFrame cb1;
 	cb1.mWorld = XMMatrixTranspose(g_World);
