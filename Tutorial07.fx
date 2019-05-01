@@ -10,11 +10,6 @@
 Texture2D txDiffuse : register( t0 );
 SamplerState samLinear : register( s0 );
 
-cbuffer cbNeverChanges : register( b0 )
-{
-    matrix View;
-};
-
 cbuffer cbChangeOnResize : register( b1 )
 {
     matrix Projection;

@@ -21,58 +21,57 @@
 #include "resource.h"
 
 //Own
-#include "Object.h"
-#include "CameraTest.h"
-#include "VectorMaths.h"
-#include <functional> 
-#include <vector>
-#include "Target.h"
-#include <string>
-//const float pi = 3.14159265359f;
-//float DegtoRag(float v)
-//{
-	//float y = v * pi / 180;
-	//return y;
-//}
-#define RenderSelector false
-#define SelectorDistance 3.5f
-#define speed -0.15f
-#define FPS 60
-#define targetDelta (1000/FPS)
-#define MouseSensitivity 0.035f
+#include "Object.h" //Import the Object class created to store and control all onscreen objects
+#include "CameraTest.h" //Import the Camera class that controls the projection and view matrix
+#include "VectorMaths.h" //A custom class full of maths functions and XMFLOAT3 Operator Oveloads
+#include <vector> //Import the Vector Data Type to hold the textures, its length can dynamically change and is useful for functions that load dynamic amounts of objects
+#include "Target.h" //Import the target class that inherets from the Object Class
 
+
+
+#define RenderSelector false //The selector is an invisible cube that is used as a bounding box for collisions with the target block. Setting this to true renders it for debugging purposes
+#define SelectorDistance 3.5f //This is the distance that the selector lies from the player camera
+#define speed -0.15f //The Speed of camera
+
+#define FPS 60 //The framerate of the sample can be set here
+#define targetDelta (1000/FPS) // Attempts at delta timing are made in the sample. Some areas are less reliant however, which is why the framerate is locked to 60
+//The sample is undemanding and would struggle to miss this target on any computer that can run DirectX11, as such delta timing was not crucial
+
+#define MouseSensitivity 0.035f //A value that is applied to the appropriate axis by rotating the Camera
+
+//Window Dimensions
 #define WindowWidth 800
 #define WindowHeight 600
+
+//Delta timing values
 float currentDelta = 0.0f;
 float ScaleFactor = 0.0f;
 float frameEnd = 0.0f;
-
 float timeLast = 0;
-using namespace DirectX;
 
+//Used to simplify work flow as opposed to DirectX::XMFLOAT3(0,0,0) e.t.c.
+using namespace DirectX;
 
 
 //--------------------------------------------------------------------------------------
 // Structures
 //--------------------------------------------------------------------------------------
-struct SimpleVertex
+struct SimpleVertex //Vertex Buffer. This originally only contained the position and Texture Data, however Normals were added to allow for lighting
 {
-	XMFLOAT3 Pos;
-	XMFLOAT2 Tex;
-	XMFLOAT3 Normal;
+	XMFLOAT3 Pos; //Shape Data
+	XMFLOAT2 Tex; //Texture Layout Data
+	XMFLOAT3 Normal; //Normal Faces data used for lighting
 };
 
-struct CBNeverChanges
+//Constant Buffer Never Changes is no longer required, originally the view matrix was stored there, but it prevented correct movement.
+
+
+struct CBChangeOnResize 
 {
-	XMMATRIX mView;
+	XMMATRIX mProjection; //Projection Matrix update on resize of the window
 };
 
-struct CBChangeOnResize
-{
-	XMMATRIX mProjection;
-};
-
-struct CBChangesEveryFrame
+struct CBChangesEveryFrame // The main constant buffer object. The world of each object, view, mesh colour and lighting data is handled by this buffer
 {
 	XMMATRIX mWorld;
 
@@ -108,7 +107,6 @@ ID3D11PixelShader*                  g_pPixelShaderSolid = nullptr; //Lighting Sh
 ID3D11InputLayout*                  g_pVertexLayout = nullptr;
 ID3D11Buffer*                       g_pVertexBuffer = nullptr;
 ID3D11Buffer*                       g_pIndexBuffer = nullptr;
-ID3D11Buffer*                       g_pCBNeverChanges = nullptr;
 ID3D11Buffer*                       g_pCBChangeOnResize = nullptr;
 ID3D11Buffer*                       g_pCBChangesEveryFrame = nullptr;
 ID3D11ShaderResourceView*           g_pTextureRV = nullptr;
@@ -117,7 +115,7 @@ XMMATRIX                            g_World;
 XMMATRIX                            g_View;
 XMMATRIX                            g_Projection;
 //XMFLOAT4                            g_vMeshColor(0.7f, 0.7f, 0.7f, 1.0f);
-XMFLOAT4 g_vMeshColor(0.15f, 0.15f, 0.15f, 1.0f);
+XMFLOAT4 g_vMeshColor(0.15f, 0.15f, 0.15f, 1.0f); //Default white light
 
 
 //--------------------------------------------------------------------------------------
@@ -160,7 +158,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		}
 		else
 		{
-			Render();
+			Render(); //Main render loop is called here
 			currentTime = timeGetTime();
 			if ((currentTime-timeLast)<(1000/FPS))
 			{
@@ -169,7 +167,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			timeLast = currentTime;
 			frameEnd = timeGetTime();
 			currentDelta = (currentTime - frameEnd);
-			ScaleFactor = (currentDelta / targetDelta);
+			ScaleFactor = (currentDelta / targetDelta); //Delta Timing is calculated here
 		}
 
 	}
@@ -438,7 +436,7 @@ HRESULT InitDevice()
 
 	// Compile the vertex shader
 	ID3DBlob* pVSBlob = nullptr;
-	hr = CompileShaderFromFile(L"Tutorial07.fx", "VS", "vs_4_0", &pVSBlob);
+	hr = CompileShaderFromFile(L"Tutorial07.fx", "VS", "vs_4_0", &pVSBlob); 
 	if (FAILED(hr))
 	{
 		MessageBox(nullptr,
@@ -459,7 +457,7 @@ HRESULT InitDevice()
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0 , DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0 , DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },  //Normal Data is included in the shader layout, included by me for lighting
 	 //Lighting Data sent through to shader file
 	};
 	UINT numElements = ARRAYSIZE(layout);
@@ -492,7 +490,7 @@ HRESULT InitDevice()
 
 	// Compile the pixel shader
 	pPSBlob = nullptr;
-	hr = CompileShaderFromFile(L"Tutorial07.fx", "PSSolid", "ps_4_0", &pPSBlob);
+	hr = CompileShaderFromFile(L"Tutorial07.fx", "PSSolid", "ps_4_0", &pPSBlob); //Compile the Solid buffer used for lighting data sent to the shader
 	if (FAILED(hr))
 	{
 		MessageBox(nullptr,
@@ -509,7 +507,7 @@ HRESULT InitDevice()
 
 
 	// Create vertex buffer
-	SimpleVertex vertices[] =
+	SimpleVertex vertices[] = //Vertices, Texture, Normal
 	{
 		{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT2(1.0f, 0.0f),XMFLOAT3(0.0f,1.0f,0.0f) },
 		{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT2(0.0f, 0.0f),XMFLOAT3(0.0f,1.0f,0.0f) },
@@ -597,15 +595,6 @@ HRESULT InitDevice()
 	// Set primitive topology
 	g_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// Create the constant buffers
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(CBNeverChanges);
-	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bd.CPUAccessFlags = 0;
-	hr = g_pd3dDevice->CreateBuffer(&bd, nullptr, &g_pCBNeverChanges);
-	if (FAILED(hr))
-		return hr;
-
 	bd.ByteWidth = sizeof(CBChangeOnResize);
 	hr = g_pd3dDevice->CreateBuffer(&bd, nullptr, &g_pCBChangeOnResize);
 	if (FAILED(hr))
@@ -644,9 +633,9 @@ HRESULT InitDevice()
 	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	g_View = XMMatrixLookAtLH(Eye, At, Up);
 
-	CBNeverChanges cbNeverChanges;
-	cbNeverChanges.mView = XMMatrixTranspose(g_View);
-	g_pImmediateContext->UpdateSubresource(g_pCBNeverChanges, 0, nullptr, &cbNeverChanges, 0, 0);
+	CBChangesEveryFrame cbframe;
+	cbframe.view2 = XMMatrixTranspose(g_View);
+	g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cbframe, 0, 0);
 
 	// Initialize the projection matrix
 	g_Projection = XMMatrixPerspectiveFovLH(XM_PIDIV4, width / (FLOAT)height, 0.01f, 100.0f);
@@ -668,7 +657,6 @@ void CleanupDevice()
 
 	if (g_pSamplerLinear) g_pSamplerLinear->Release();
 	if (g_pTextureRV) g_pTextureRV->Release();
-	if (g_pCBNeverChanges) g_pCBNeverChanges->Release();
 	if (g_pCBChangeOnResize) g_pCBChangeOnResize->Release();
 	if (g_pCBChangesEveryFrame) g_pCBChangesEveryFrame->Release();
 	if (g_pVertexBuffer) g_pVertexBuffer->Release();
@@ -1271,7 +1259,7 @@ void Render()
 	//Selector.SetTexture(Animate[animy]);
 	ID3D11ShaderResourceView*           Tex = TargetObject->Texture();
 	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
-	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBNeverChanges);
+	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
 	g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
 	g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
 	g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
@@ -1306,7 +1294,7 @@ void Render()
 	EndGoal->function.SetTexture(texturelist[animy]);
 	Tex = EndGoal->function.Texture();
 	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
-	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBNeverChanges);
+	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
 	g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
 	g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
 	g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
@@ -1347,7 +1335,7 @@ void Render()
 		//Selector.SetTexture(Animate[animy]);
 		ID3D11ShaderResourceView*           tempy = Selector.Texture();
 		g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
-		g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBNeverChanges);
+		g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
 		g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
@@ -1386,7 +1374,7 @@ void Render()
 		// Render the cube
 		//
 		g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
-		g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBNeverChanges);
+		g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
 		g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
@@ -1421,7 +1409,7 @@ void Render()
 	ID3D11ShaderResourceView*           tempy = Selector.Texture();
 
 	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
-	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBNeverChanges);
+	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
 	g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
 	g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
 	g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
@@ -1452,7 +1440,7 @@ void Render()
 		// Render the cube
 		//
 		g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
-		g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBNeverChanges);
+		g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
 		g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
