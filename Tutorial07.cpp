@@ -26,7 +26,7 @@
 #include "VectorMaths.h" //A custom class full of maths functions and XMFLOAT3 Operator Oveloads
 #include <vector> //Import the Vector Data Type to hold the textures, its length can dynamically change and is useful for functions that load dynamic amounts of objects
 #include "Target.h" //Import the target class that inherets from the Object Class
-
+#include "Goal.h"
 
 
 #define RenderSelector false //The selector is an invisible cube that is used as a bounding box for collisions with the target block. Setting this to true renders it for debugging purposes
@@ -254,8 +254,8 @@ HRESULT CompileShaderFromFile(const WCHAR* szFileName, LPCSTR szEntryPoint, LPCS
 
 	return S_OK;
 }
-ID3D11ShaderResourceView* Wood;
-ID3D11ShaderResourceView* TargetTex;
+ID3D11ShaderResourceView* Wood; //Create a memory location for my "wood" texture
+ID3D11ShaderResourceView* TargetTex; //Create a memory location for the Target Texture
 //--------------------------------------------------------------------------------------
 // Create Direct3D device and swap chain
 //--------------------------------------------------------------------------------------
@@ -606,7 +606,7 @@ HRESULT InitDevice()
 		return hr;
 
 	// Load the Texture
-	hr = CreateDDSTextureFromFile(g_pd3dDevice, L"seafloor.dds", nullptr, &g_pTextureRV);
+	hr = CreateDDSTextureFromFile(g_pd3dDevice, L"seafloor.dds", nullptr, &g_pTextureRV); //Point the texture loaded from file into the desired pointer
 	if (FAILED(hr))
 		return hr;
 
@@ -622,27 +622,17 @@ HRESULT InitDevice()
 	hr = g_pd3dDevice->CreateSamplerState(&sampDesc, &g_pSamplerLinear);
 	if (FAILED(hr))
 		return hr;
-	CreateDDSTextureFromFile(g_pd3dDevice, L"CustomWood.dds", nullptr, &Wood);
-	CreateDDSTextureFromFile(g_pd3dDevice, L"Target.dds", nullptr, &TargetTex);
+	CreateDDSTextureFromFile(g_pd3dDevice, L"CustomWood.dds", nullptr, &Wood); //Point the texture loaded from file into the desired pointer
+	CreateDDSTextureFromFile(g_pd3dDevice, L"Target.dds", nullptr, &TargetTex); //Point the texture loaded from file into the desired pointer
 	// Initialize the world matrices
 	g_World = XMMatrixIdentity();
 
-	// Initialize the view matrix
-	XMVECTOR Eye = XMVectorSet(0.0f, 3.0f, -6.0f, 0.0f);
-	XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	g_View = XMMatrixLookAtLH(Eye, At, Up);
-
-	CBChangesEveryFrame cbframe;
-	cbframe.view2 = XMMatrixTranspose(g_View);
-	g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cbframe, 0, 0);
-
 	// Initialize the projection matrix
-	g_Projection = XMMatrixPerspectiveFovLH(XM_PIDIV4, width / (FLOAT)height, 0.01f, 100.0f);
+	g_Projection = XMMatrixPerspectiveFovLH(XM_PIDIV4, width / (FLOAT)height, 0.01f, 100.0f); 
 
-	CBChangeOnResize yus;
-	yus.mProjection = XMMatrixTranspose(g_Projection);
-	g_pImmediateContext->UpdateSubresource(g_pCBChangeOnResize, 0, nullptr, &yus, 0, 0);
+	CBChangeOnResize Projection;
+	Projection.mProjection = XMMatrixTranspose(g_Projection);
+	g_pImmediateContext->UpdateSubresource(g_pCBChangeOnResize, 0, nullptr, &Projection, 0, 0);
 
 	return S_OK;
 }
@@ -679,110 +669,50 @@ void CleanupDevice()
 //--------------------------------------------------------------------------------------
 // Called every time the application receives a message
 //--------------------------------------------------------------------------------------
-char horizontal;
-char vertical;
-bool holding = false;
-bool forwardtime;
-float previousX;
+bool Forward; //Used to determine if the player is moving forward or not by assinging this in the input code
+bool holding = false; //Determines if the Target block is held or not, and whether it should spin and be set to the selector's position
+
+float previousX; //PreviousX/Y location on screen stored for comparison with CurrentX/Y to detirmine what direction the camera should rotate
 float currentX;
 float previousY;
 float currentY;
-bool rotating = true;
-CameraTest CamBhoy;
+
+CameraTest CamBhoy; //Setting up the camera object for use with a class that will generate the View Matrix and rotation/translation matrix for camera movement
 
 
-Goal *EndGoal = new Goal;
+Goal *EndGoal = new Goal;  //Target and Goal Objects Generated for usage. They are rather redundant in their application, but don't cost performance either.
 Target *TargetObject = new Target;
 
 
-
-std::vector<Object*> CreateRow(int length, int row)
+//A function for creating a flat Row of set length by storing cube objects in a vector list and returning it.
+std::vector<Object*> CreateRow(int length, int row) 
 {
-	std::vector<Object*> Floor;
-	Object *temp = new Object;
-	for (int i = 0; i < length; i++)
+	std::vector<Object*> Floor; //Define a Vector list of Object Pointers
+	Object *temp = new Object; //Reserve memory for a Object to be passed to the Vector
+	for (int i = 0; i < length; i++) //Run through the length and generate the desired amount
 	{
-		temp = new Object;
-		temp->SetPos(XMFLOAT3(i * 2, 0, row * 2));
-		temp->SetTexture(Wood);
-		Floor.push_back(temp);
+		temp = new Object; //Set temp to a new object 
+		temp->SetPos(XMFLOAT3(i * 2, 0, row * 2)); //Offset the postion
+		temp->SetTexture(Wood); //Set the texture of the object in its own scope
+		Floor.push_back(temp); //Send this to the Vector List
 	}
-	delete temp;
+	delete temp; //Clear the temp memory location and return the vector List
 	temp = NULL;
 	return Floor;
 }
 
+//Struct object for defining a floor of X length and width. 
 struct Room
 {
 public:
-	XMFLOAT3 Position = XMFLOAT3(0, 0, 0);
-	std::vector<Object*> Floor;
-	Object *temp = new Object;
-	Room(int length, int width, int height)
+	std::vector<Object*> Floor; //Define a Vector List for storing this floor
+	Room(int length, int width, int height) //Unused Height Paramater for future expansion, trouble with building a room was encountered
 	{
-		//AB.clear();
-		//AB.~vector();
 		for (int i = 0; i < length - 1; i++) //Floor
 		{
-			std::vector<Object*> AB = CreateRow(width, i);
-			Floor.insert(Floor.end(), AB.begin(), AB.end());
+			std::vector<Object*> AB = CreateRow(width, i); //Create a row in AB
+			Floor.insert(Floor.end(), AB.begin(), AB.end()); //Add AB to Floor
 		}
-
-
-		//for(int i=0;)
-		//Floor += CreateRow(5, 0);
-		//for (x; x < length;)
-	//	{
-		//	for (y;y<height;)
-		//	{
-				//temp = new Object();
-				//temp->SetPos(XMFLOAT3(x * 2, 0, y*2));
-				//Floor.push_back(temp);
-			//}
-		//}
-		delete temp;
-		temp = NULL;
-		//for (int x = 0; x < width; x++)
-	//	{
-		//	for (int z = 0; z < length; z++)
-		//	{
-		//		temp = new Object();
-		//		temp->SetPos(XMFLOAT3(x*2, 0, z*2));
-		//		Floor.push_back(temp);
-				//if (z==0||z==length)
-				//{
-				//	XMFLOAT3 tempos = temp->GetPos();
-				//	temp = new Object();
-				//	temp->SetPos(XMFLOAT3(tempos.x, tempos.y+2, tempos.z));
-				//	Floor.push_back(temp);
-				//}
-			//	if (x==0 || x==length || z==0 || z==height)
-			//	{
-			//		temp = new Object();
-		//			temp->SetPos(XMFLOAT3(x * 2, 2, z * 2));
-		//			Floor.push_back(temp);
-			//	}
-		//	}
-
-				//for (int y = 0; y < height; y++)
-				//{
-				//	temp = new Object();
-				//	XMFLOAT3 tempos = Floor[Floor.size() - 1]->GetPos();
-				//	temp->SetPos(XMFLOAT3(tempos.x, tempos.y + 2, tempos.z));
-				//	Floor.push_back(temp);
-				//}
-			//temp = new Object();
-			//XMFLOAT3 tempos = Floor[Floor.size() - 1]->GetPos();
-			//temp->SetPos(XMFLOAT3(tempos.x, tempos.y + 2, tempos.z));
-			//Floor.push_back(temp);
-
-		//}
-	//	XMFLOAT3 tempos = Floor[Floor.size() - 1]->GetPos();
-	//	tempos += XMFLOAT3(tempos.x + 2, 0, tempos.z + 2);
-	//	temp = new Object();
-	//	temp->SetPos(tempos);
-	//	delete temp;
-		//temp = NULL;
 	}
 	Room()
 	{
@@ -790,102 +720,81 @@ public:
 	}
 };
 
-/*Room(int length, int width, int height)
-{
-	for (int x = 0; x < width; x++)
-	{
-		for (int z = 0; z < length; z++)
-		{
-			temp = new Object();
-			temp->SetPos(XMFLOAT3(x * 2, 0, z * 2));
-			Floor.push_back(temp);
-		}
-	}
-	XMFLOAT3 tempos = Floor[Floor.size() - 1]->GetPos();
-	tempos += XMFLOAT3(tempos.x + 2, 0, tempos.z + 2);
-	temp = new Object();
-	temp->SetPos(tempos);
-	delete temp;
-	temp = NULL;*/
 
-bool grabbing = false;
+bool grabbing = false; //Boolean for testing if intersection has occured
+
+//Basic Function that moves the mouse depending on the state of the mouse through current and previous positions
 void MouseMovement()
 {
-	if (currentX < previousX)
+	if (currentX < previousX) //Moving Left
 	{
-		CamBhoy.Rotate(0, -MouseSensitivity, 0);
+		CamBhoy.Rotate(0, -MouseSensitivity, 0); //Rotate on the Y axis by Mouse sensitivity
 	}
-	else if (currentX > previousX)
+	else if (currentX > previousX) //Right
 	{
 		CamBhoy.Rotate(0, MouseSensitivity, 0);
 	}
-	if (currentY < previousY)
+	if (currentY < previousY) //Down
 	{
 		CamBhoy.Rotate(-MouseSensitivity, 0, 0);
 	}
-	else if (currentY > previousY)
+	else if (currentY > previousY) //UP
 	{
 		CamBhoy.Rotate(MouseSensitivity, 0, 0);
 	}
 }
-bool once = false;
+bool backward = false; //Booleans that control the player's movement
+bool left = false;
+bool right = false;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hdc;
-	if (message == WM_KEYDOWN)
+	if (message == WM_KEYDOWN) //If a windows event is equal to a KeyDown message
 	{
-		if (wParam == 'A')
+		if (wParam == 'W') //Forward input for the camera
 		{
-			horizontal = 'l';
+			Forward = true; //Set the boolean variables for what direction the player is moving in
+			backward = false;
 		}
-		if (wParam == 'D')
+		else if (wParam == 'S') //Backward input for the camera
 		{
-			horizontal = 'r'; //Right
+			Forward = false; //Set the boolean variables for what direction the player is moving in
+			backward = true;
 		}
-		if (wParam == 'W')
+		if (wParam == 'A') //Left input for the camera
 		{
-			vertical = 'u'; //UP
-			forwardtime = true;
+			left = true; //Set the boolean variables for what direction the player is moving in
+			right = false;
 		}
-		if (wParam == 'S')
+		else if (wParam == 'D') //Right input for the camera
 		{
-			vertical = 'd'; //Down
+			left = false; //Set the boolean variables for what direction the player is moving in
+			right = true;
 		}
-		if (wParam == 'E')
+
+		if (wParam == 'E') //Test if the player is grabbing the target block with the "grabbing" boolean
 		{
 			grabbing = true;
-		//	if (holding == false)
-			//{
-			//	holding = true;
-			//}
-			//else
-		//	{
-		//		holding = false;
-		//	}
-		///	if (once == true)
-		//	{
-			//	once = false;
-			//}
 		}
 	}
-	if (message == WM_KEYUP)
+	if (message == WM_KEYUP) //If a windows event is equal to a KeyUp message
 	{
-		if (wParam == 'A' && horizontal != 'r')
+		if (wParam=='W') //Set the Forward and backward variables to be false in the case of a player ceasing to move in that direction
 		{
-			horizontal = 'n';
+			Forward = false;
 		}
-		if (wParam == 'D' && horizontal != 'l')
+		else if (wParam == 'S')
 		{
-			horizontal = 'n';
+			backward = false;
 		}
-		if (wParam == 'W' && vertical != 'd')
+		if (wParam == 'A') //Set the Forward and backward variables to be false in the case of a player ceasing to move in that direction
 		{
-			vertical = 'n';
+			left = false;
 		}
-		if (wParam == 'S' && vertical != 'u')
+		else if (wParam == 'D')
 		{
-			vertical = 'n';
+			right = false;
 		}
 	}
 	switch (message)
@@ -898,12 +807,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
-	case WM_MOUSEMOVE:
-		//PostQuitMessage(0);
-		//ClipCursor(&sizey);
-		previousX = currentX;//Replace the old previous
-		currentX = MAKEPOINTS(lParam).x;//Collect pointer coords?
-		previousY = currentY;
+	case WM_MOUSEMOVE: //On the windows event of mouse movement the appropriate mouse input is processed
+
+		previousX = currentX;//Replace the old previous to be the current X
+		currentX = MAKEPOINTS(lParam).x; //Collect the new mouseX coordinates
+		previousY = currentY; //Complete the process for the Y axis
 		currentY = MAKEPOINTS(lParam).y;
 		MouseMovement();
 		break;
@@ -915,93 +823,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-Object test(XMFLOAT3(0, 3, 0));
-Object test2(XMFLOAT3(0, 2, 4));
-XMVECTOR Eye = XMVectorSet(0.0f, 3.0f, -6.0f, 0.0f);
-XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
 //--------------------------------------------------------------------------------------
 // Render a frame
 //--------------------------------------------------------------------------------------
-XMMATRIX g_World2;
-Object ObjectList[10];
-void runthroughtheselads()
-{
-	ObjectList[0].SetPos(0, 0, 0);
-	ObjectList[2].SetPos(2, 0, 0);
-	ObjectList[3].SetPos(4, 0, 0);
-	ObjectList[4].SetPos(6, 0, 0);
-	ObjectList[5].SetPos(8, 0, 0);
-	ObjectList[6].SetPos(10, 0, 0);
-	ObjectList[7].SetPos(12, 0, 0);
-	ObjectList[8].SetPos(14, 0, 0);
-	ObjectList[9].SetPos(16, 0, 0);
-}
-
-void offsettheseboiis()
-{
-	float bobly = 0;
-	for (int i = 0; i < 10; i++)
-	{
-		//XMFLOAT3 temp = ObjectList[i].GetPos();
-		//temp = XMFLOAT3(temp.x + i, temp.y, temp.z);
-		ObjectList[i].Move(i, 0, 0);
-		//ObjectList[i].SetPos(i,i,i);
-	}
-}
-
-float rotty;
-
-
-XMFLOAT3 temp;
-bool legitonce = true;
-Object Selector = Object(XMFLOAT3(0, 0, 0), true);
-Room bob(5, 5, 5);
-ID3D11ShaderResourceView* Animate[4];
-int animy = 0;
-Target testyy;
-
-ID3D11ShaderResourceView* Goals[10];
-wchar_t Dontreusevariablenamesidiot[40] = L"goal01.dds";
-void createTexture() //This function will add a number on the end of the suffix you supply it
-{
-	char *local= new char;
-	for (int i = 0; i < 10; i++)
-	{
-	   itoa(i, local, 10);
-	   Dontreusevariablenamesidiot[4] = local[0];
-	   CreateDDSTextureFromFile(g_pd3dDevice, Dontreusevariablenamesidiot, nullptr, &Goals[i]);
-	   local = new char;
-	}
-	delete local;
-	local = NULL;
-}
-std::vector<ID3D11ShaderResourceView*> texturelist;
-/*void createTexture(short numberoftextures,std::string name) //This function will add a number on the end of the suffix you supply it
-{
-	const int size = name.size();
-	wchar_t** arr = new wchar_t*[size];
-	char* local = new char;
-	for (int i = 0; i < numberoftextures; i++)
-	{
-		itoa(i, local, 10);
-		Dontreusevariablenamesidiot[4] = local[0];
-		CreateDDSTextureFromFile(g_pd3dDevice, Dontreusevariablenamesidiot, nullptr, &Goals[i]);
-	}
-
-	for (int i = 0; i < numberoftextures; i++)
-	{
-		delete[] arr[i];
-		arr[i] = NULL;
-	}
-	delete local;
-	local = NULL;
-}*/
 
 
 
+XMFLOAT3 temp; //Simple Float 3 used for directions
+bool Startup = true; //First frame setup variable
+Object Selector = Object(XMFLOAT3(0, 0, 0), true); //Selector block used by the player
+Room FloorTest(5, 5, 5); //Room struct being used to construct a floor of blocks
 
 
+int animy = 0; //Integer that controls which frame of animations is being accessed
+
+
+wchar_t Charholder[40] = L"goal01.dds"; //A charlist that holds the file name that the DDS loader loads from.
+
+std::vector<ID3D11ShaderResourceView*> texturelist; //The Vector list that is defined to hold textures loaded from memory
+
+
+//Custom function that is used to manipulate the suffix number of the selected texture. 
+//Supply the Number of Texture files and ensure texture name is 4 characters long with a theme of 00 on the end e.g. "goal00.dds"
 void createTexture(short numberoftextures)
 {
 	
@@ -1015,8 +859,8 @@ void createTexture(short numberoftextures)
 	{
 		ID3D11ShaderResourceView* LocalTexture; //Create a texture to append to the list;
 		itoa(first, end, 10); //Assign i's number as its ascii equivalanet
-		Dontreusevariablenamesidiot[5] = end[0]; //Derefrence the pointer and set the texture name's last number
-		CreateDDSTextureFromFile(g_pd3dDevice, Dontreusevariablenamesidiot, nullptr, &LocalTexture); //Create a texture from these details
+		Charholder[5] = end[0]; //Derefrence the pointer and set the texture name's last number
+		CreateDDSTextureFromFile(g_pd3dDevice, Charholder, nullptr, &LocalTexture); //Create a texture from these details
 		texturelist.push_back(LocalTexture); //Push this into the vector that contains this texture
 		end = new char;
 		large = new char;
@@ -1028,7 +872,7 @@ void createTexture(short numberoftextures)
 		{
 			second++;
 			itoa(second, large, 10); //Assign i's number as its ascii equivalanet
-			Dontreusevariablenamesidiot[4] = large[0];
+			Charholder[4] = large[0];
 			first = 0;
 		}
 	}
@@ -1040,84 +884,48 @@ void createTexture(short numberoftextures)
 
 
 
-struct Scene
-{
-	//Process the Selector, Map Geometry , Target and Goal are all defined inside this structure and 
-	Object *Selector = new Object;
-	Target *TargetObject = new Target;
-	Room *RoomObject = new Room;
 
-	Scene()
-	{
-		 *RoomObject=Room(5, 5, 5);
-		 *Selector = Object(XMFLOAT3(0, 0, 0), true);
-		 Selector->SetTexture(Animate[0]); //Set a texture for the Selector In case I wish to debug it
-		 *TargetObject = Target(XMFLOAT3(0,0,0));
+Object ExampleTexturelessBlock;
 
-	}
-
-
-	void Process()
-	{
-
-	}
-
-};
-int animy2 = 0;
-
-
-XMMATRIX mLight;
-XMMATRIX mLightScale;
-XMMATRIX mRotate;
-XMVECTOR vLightDir;
-
+//Reset/set the Game Settings to the startup
 void Reset()
 {
 	TargetObject->SetPos(11, 5, 7); //Set the position of the target object the player must grab
-	TargetObject->SetTexture(TargetTex); //Set the texture of this object to be the correct texture
-	EndGoal->function.SetPos(2, 2, 2); //
+	TargetObject->SetTexture(TargetTex); //Set the texture of the target to be the correct texture
+
+	EndGoal->function.SetPos(2, 2, 2);  //Do the same for the end goal
 	EndGoal->function.SetTexture(texturelist[0]);
-	CamBhoy.SetPos(0, 3, 0);
+	ExampleTexturelessBlock.SetPos(15, 2, 4);
+	CamBhoy.SetPos(0, 3, 0); //Set the camera position
 }
 
+//Check if the end condtions have been met
 void CheckIfWon()
 {
-	if (EndGoal->function.Intersects(*TargetObject)==true)
+	if (EndGoal->function.Intersects(*TargetObject)==true) //The Target has intesected the Goal
 	{
 		holding = false;
 		grabbing = false;
 		Reset();
 		WndProc(g_hWnd, WM_DESTROY, NULL, NULL); //Shutdown
 	}
-	else
+	else //The attempt failed
 	{
 		holding = false;
 		grabbing = false;
 	}
 }
 
-Object ExampleTexturelessBlock;
-
 void Render()
 {
-	// Update our time
-	if (legitonce == true)
+	if (Startup == true)
 	{
-		ObjectList[3].SetPos(XMFLOAT3(6, 7, 0));
-		legitonce = false;
-		//createTexture(4, "goal1.dds");
-		createTexture(29);
-	//	CreateDDSTextureFromFile(g_pd3dDevice, L"Test.dds", nullptr, &Animate[0]);
-	//	CreateDDSTextureFromFile(g_pd3dDevice, L"Test1.dds", nullptr, &Animate[1]);
-	//	CreateDDSTextureFromFile(g_pd3dDevice, L"goal1.dds", nullptr, &Animate[2]);
-	//	CreateDDSTextureFromFile(g_pd3dDevice, L"goal1.dds", nullptr, &Animate[3]);
-		wchar_t Name[40] = L"Test.dds";
-		//Selector.SetTexture(Name, g_pd3dDevice);
-		test.SetPos(6, 3, 3);
-		Reset();
-		ExampleTexturelessBlock.SetPos(15, 2, 4);
-		//createTexture();
+		Startup = false;
+		createTexture(29); //Populate the TextureList
+		Reset(); //Set object positions
 	}
+
+	// Update our time
 	static float t = 0.0f;
 	if (g_driverType == D3D_DRIVER_TYPE_REFERENCE)
 	{
@@ -1131,30 +939,27 @@ void Render()
 			timeStart = timeCur;
 		t = (timeCur - timeStart) / 1000.0f;
 	}
-	if (horizontal == 'l')
-	{
-		offsettheseboiis();
-	}
-	if (horizontal == 'r')
-	{
-		for (int i = 0; i < 10; i++)
-		{
-			ObjectList[i].Move(XMFLOAT3(0.001f, 0, 0));
-		}
-	}
 	temp = ForwardDirection(CamBhoy.GetRotionFloat3()); //Get the forward direction of the Camera
-	if (vertical == 'u')
+	
+	if (Forward == true) //Movement conditions are set by booleans
 	{
-		CamBhoy.MoveFrom(temp.x*speed*ScaleFactor, -temp.y*speed*ScaleFactor, temp.z*speed*ScaleFactor);
+		CamBhoy.MoveFrom(temp.x*speed*ScaleFactor, -temp.y*speed*ScaleFactor, temp.z*speed*ScaleFactor); //Update the Camera's postion from the previous position by offseting by the temp vector
 	}
-	if (vertical == 'd'& once == false)
+	else if(backward==true)
 	{
-		for (int i = 0; i < 10; i++)
-		{
-			ObjectList[i].Move(i, 0, 0);
-		}
-		once = true;
+		CamBhoy.MoveFrom(temp.x*-speed*ScaleFactor, -temp.y*-speed*ScaleFactor, temp.z*-speed*ScaleFactor); //Move the opposite direction to the forward vector
 	}
+	if (left == true)
+	{
+		XMFLOAT3 dir = temp * speed*ScaleFactor;
+		CamBhoy.MoveFrom(VectorCrossProduct(dir, XMFLOAT3(0, 1, 0))); //Create a crossproduct for the left direction
+	}
+	else if (right == true)
+	{
+		XMFLOAT3 dir = temp * speed*ScaleFactor;
+		CamBhoy.MoveFrom(VectorCrossProduct(dir, XMFLOAT3(0, -1, 0))); //Create a crossproduct for the right direciton
+	}
+
 
 	// Setup our lighting parameters
 	XMFLOAT4 vLightDirs[2] =
@@ -1168,17 +973,18 @@ void Render()
 		XMFLOAT4(0, 0.0f, 1, 1.0f)
 	};
 
+
+
+	XMMATRIX mLight;
+	XMMATRIX mLightScale;
+	XMMATRIX mRotate;
+	XMVECTOR vLightDir;
+
 	// Rotate the second light around the origin
 	mRotate = XMMatrixRotationY(t);
 	vLightDir = XMLoadFloat4(&vLightDirs[1]);
 	vLightDir = XMVector3Transform(vLightDir, mRotate);
 	XMStoreFloat4(&vLightDirs[1], vLightDir);
-
-
-
-
-
-
 
 
 	//
@@ -1194,57 +1000,46 @@ void Render()
 	//
 	// Update variables that change once per frame
 	//
-	Selector.SetPos(CamBhoy.GetPos() + XMFLOAT3(temp.x, -temp.y, temp.z)*SelectorDistance);
-	if (grabbing == true&&holding!=true)
+	Selector.SetPos(CamBhoy.GetPos() + XMFLOAT3(temp.x, -temp.y, temp.z)*SelectorDistance); //Set the selector to be a set distance Vector from the Camera
+
+	if (grabbing == true&&holding!=true) //Booleans control the logic for whether the target block is being held, a grab is being attempted or if it has been successful
 	{
-		//Selector.SetPos(XMFLOAT3(-6000, 400, 200));
 		if (TargetObject->Intersects(Selector) == true) //Test for collision between selector cube and target
 		{
 			holding = true;
 		}
-		else
-		{
-			grabbing = false;
-			//once = false;
-		}
 		grabbing = false;
 	}
-	else if (holding == true &&grabbing==true)
+	else if (holding == true &&grabbing==true) //As grabbing is true when a drop is attempted, this means that an intersection test is only made when the player desires, saving cpu cycles.
 	{
 		CheckIfWon();
-		//holding = false;
 	}
-	if (holding == true)
+	if (holding == true) //If the block is being held, it must be a set distance from the player so that they can see whilst it follows the camera
 	{
 		TargetObject->SetPos(CamBhoy.GetPos() + XMFLOAT3(temp.x, -temp.y, temp.z) * 5);
 	}
 
 
 
-	//TargetObject->Update();
+	//Rendering of Target Object
 
+	XMVECTOR PositionMatrix = XMLoadFloat3(&TargetObject->GetPos()); //Get the position of the Target Block and store it temporarily
 
-	//TargetObjectRendering
-	XMVECTOR PositionMatrix = XMLoadFloat3(&TargetObject->GetPos());
-
-	//g_World = XMMatrixRotationRollPitchYaw(TargetObject->GetRotation().x, TargetObject->GetRotation().y, TargetObject->GetRotation().z);
-	if (holding == true)
+	if (holding == true) //If the block is being held it should not spin.
 	{
-		g_World = XMMatrixTranslationFromVector(PositionMatrix);
-		//TargetObject->SetRotation(XMFLOAT3(0, 0, 0));
-
+		g_World = XMMatrixTranslationFromVector(PositionMatrix); //g_world to be the unmodified position as it is not rotating
 	}
-	else
+	else //The object is rotating and the Rotation matrix should be defined and set into g_world and then * by the translation matrix to abide to TRS order matrix multiplication
 	{
 		TargetObject->SetRotation(XMFLOAT3(t, t, t));
 		g_World = XMMatrixRotationRollPitchYaw(TargetObject->GetRotation().x, TargetObject->GetRotation().y, TargetObject->GetRotation().z);
-		g_World *= XMMatrixTranslationFromVector(PositionMatrix);
+		g_World *= XMMatrixTranslationFromVector(PositionMatrix); //TRS
 	}
 	CBChangesEveryFrame cb; //Create a constant buffer to be sent to the shader file
 	cb.mWorld = XMMatrixTranspose(g_World); //Set the Constant Buffer's world position
 	cb.vMeshColor = g_vMeshColor;  //Set the colour of the object
 	cb.view2 = XMMatrixTranspose(CamBhoy.GetViewMatrix()); //Set the view matrix to that of the camera class
-	cb.vLightDir[0] = vLightDirs[0];
+	cb.vLightDir[0] = vLightDirs[0]; //Define Lighting Data
 	cb.vLightDir[1] = vLightDirs[1];
 	cb.vLightColor[0] = vLightColors[0];
 	cb.vLightColor[1] = vLightColors[1];
@@ -1256,9 +1051,8 @@ void Render()
 	//
 	// Render the cube
 	//
-	//Selector.SetTexture(Animate[animy]);
-	ID3D11ShaderResourceView*           Tex = TargetObject->Texture();
-	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
+	ID3D11ShaderResourceView*           Tex = TargetObject->Texture(); //Set the Texture to be the Target's stored Texture, storing it in Tex
+	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0); //Apply Shader Paramaters
 	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
 	g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
 	g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
@@ -1268,17 +1062,17 @@ void Render()
 	g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
 	cb.vOutputColor = vLightColors[0];
 	g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0);
-	g_pImmediateContext->DrawIndexed(36, 0, 0);
+	g_pImmediateContext->DrawIndexed(36, 0, 0); //Draw the Cube
 
 
 	//GoalObject Rendering
-	PositionMatrix = XMLoadFloat3(&EndGoal->function.GetPos());
-	g_World = XMMatrixTranslationFromVector(PositionMatrix);
+	PositionMatrix = XMLoadFloat3(&EndGoal->function.GetPos()); //Get the position and store it 
+	g_World = XMMatrixTranslationFromVector(PositionMatrix); //Just load the position as the object does not rotate or scale 
 	cb; //Create a constant buffer to be sent to the shader file
 	cb.mWorld = XMMatrixTranspose(g_World); //Set the Constant Buffer's world position
 	cb.vMeshColor = g_vMeshColor;  //Set the colour of the object
 	cb.view2 = XMMatrixTranspose(CamBhoy.GetViewMatrix()); //Set the view matrix to that of the camera class
-	cb.vLightDir[0] = vLightDirs[0];
+	cb.vLightDir[0] = vLightDirs[0]; //Set Lighting Data
 	cb.vLightDir[1] = vLightDirs[1];
 	cb.vLightColor[0] = vLightColors[0];
 	cb.vLightColor[1] = vLightColors[1];
@@ -1290,10 +1084,9 @@ void Render()
 	//
 	// Render the cube
 	//
-	//Selector.SetTexture(Animate[animy]);
-	EndGoal->function.SetTexture(texturelist[animy]);
+	EndGoal->function.SetTexture(texturelist[animy]); //Set the Texture to be one of the "animated" textures found in Texture list. This List only contains 15 frames of unique animation, but items are looped twice to stay for 30fps (In hindsight 4 times would at least have matched the locked framerate of 60)
 	Tex = EndGoal->function.Texture();
-	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
+	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0); //Apply Shader Parameters
 	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
 	g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
 	g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
@@ -1303,12 +1096,12 @@ void Render()
 	g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
 	cb.vOutputColor = vLightColors[0];
 	g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0);
-	g_pImmediateContext->DrawIndexed(36, 0, 0);
+	g_pImmediateContext->DrawIndexed(36, 0, 0); //Draw
 
 
 
 
-	// Code for rendering the Selector Cube
+	// Code for rendering the Selector Cube if desired. This is the same as above, just the cube is textureless and Selector is never given a texture. This was used for debugging, but can easily be changed with the define setting above
 	if (RenderSelector == true)
 	{
 		XMVECTOR SelectorMatrix = XMLoadFloat3(&Selector.GetPos()); //Get the Matrix of the selector cube and feed this into G world
@@ -1355,50 +1148,19 @@ void Render()
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
 	}
 
-	for (unsigned short i = 0; i < 10; i++) //A loop that runs through all objects that need rendering
-	{
-		XMVECTOR MatrixPosition = XMLoadFloat3(&ObjectList[i].GetPos()); //Get the position of Object[i] and feed this into a Matrix
-		g_World = XMMatrixTranslationFromVector(MatrixPosition); //Set the world position for feeding into a constant buffer
-		CBChangesEveryFrame cb; //Create a constant buffer
-		cb.mWorld = XMMatrixTranspose(g_World); //Set this Position 
-		cb.vMeshColor = g_vMeshColor; //Apply the colour as three floats 
-		cb.view2 = XMMatrixTranspose(CamBhoy.GetViewMatrix()); //Set the view matrix to the Camera's
-		cb.vLightDir[0] = vLightDirs[0];
-		cb.vLightDir[1] = vLightDirs[1];
-		cb.vLightColor[0] = vLightColors[0];
-		cb.vLightColor[1] = vLightColors[1];
-		cb.vOutputColor = XMFLOAT4(0, 0, 0, 0);
-		
-		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0); //Start sending the appropriate settings to the shader 
-		//
-		// Render the cube
-		//
-		g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
-		g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
-		g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
-		g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
-		g_pImmediateContext->PSSetShader(g_pPixelShader, nullptr, 0);
-		g_pImmediateContext->PSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
-		g_pImmediateContext->PSSetShaderResources(0, 1, &g_pTextureRV);
-		//g_pImmediateContext->PSSetShaderResources(0, 1, &tempy);
-		g_pImmediateContext->PSSetSamplers(0, 1, &g_pSamplerLinear);
-		g_pImmediateContext->DrawIndexed(36, 0, 0);
-
-
-	}
 
 	//Object ExampleTexturelessBlock;
 
-	//GoalObject Rendering
-	PositionMatrix = XMLoadFloat3(&ExampleTexturelessBlock.GetPos());
-	g_World= XMMatrixScaling(sinf((-t + 0.002f) / 4),1,tanf((t + 0.002f) / 4));
-	g_World *= XMMatrixRotationRollPitchYaw(-t, -t , t);
-	g_World *= XMMatrixTranslationFromVector(PositionMatrix);
-	//cb; //Create a constant buffer to be sent to the shader file
+	PositionMatrix = XMLoadFloat3(&ExampleTexturelessBlock.GetPos()); //Load the position into the Position Matrix
+	g_World= XMMatrixScaling(sinf(-t  / 6),1,tanf(t  / 6)); //Scale the object by t on the X and Y axis. 
+	g_World *= XMMatrixRotationRollPitchYaw(-t, -t , t); //Rotate on each axis and multiply g_world by this to abide by TRS
+	g_World *= XMMatrixTranslationFromVector(PositionMatrix); //Finally offset by the Translation Matrix, completing TRS order
+
+	//Apply values to the constant buffer
 	cb.mWorld = XMMatrixTranspose(g_World); //Set the Constant Buffer's world position
 	cb.vMeshColor = g_vMeshColor;  //Set the colour of the object
 	cb.view2 = XMMatrixTranspose(CamBhoy.GetViewMatrix()); //Set the view matrix to that of the camera class
-	cb.vLightDir[0] = vLightDirs[0];
+	cb.vLightDir[0] = vLightDirs[0]; //Setup Lighting Data
 	cb.vLightDir[1] = vLightDirs[1];
 	cb.vLightColor[0] = vLightColors[0];
 	cb.vLightColor[1] = vLightColors[1];
@@ -1406,9 +1168,9 @@ void Render()
 
 
 	g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb, 0, 0); //Start applying rendering settings to be sent to the shader file through the changing constant buffer
-	ID3D11ShaderResourceView*           tempy = Selector.Texture();
+	ID3D11ShaderResourceView*           tempy = Selector.Texture(); //Select Null texture purposefully
 
-	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
+	g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0); //Apply shader settings
 	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
 	g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
 	g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
@@ -1421,16 +1183,16 @@ void Render()
 	g_pImmediateContext->DrawIndexed(36, 0, 0);
 
 
-	for (int i = 0; i < bob.Floor.size(); i++)
+	for (int i = 0; i < FloorTest.Floor.size(); i++) //Draw the floor sequentially
 	{
-		XMVECTOR MatrixPosition = XMLoadFloat3(&bob.Floor[i]->GetPos()); //Get the position of Object[i] and feed this into a Matrix
+		XMVECTOR MatrixPosition = XMLoadFloat3(&FloorTest.Floor[i]->GetPos()); //Get the position of Object[i] and feed this into a Matrix
 		g_World = XMMatrixTranslationFromVector(MatrixPosition); //Set the world position for feeding into a constant buffer
-		ID3D11ShaderResourceView*           tempy =bob.Floor[i]->Texture();
+		ID3D11ShaderResourceView*           tempy = FloorTest.Floor[i]->Texture();
 		CBChangesEveryFrame cb; //Create a constant buffer
 		cb.mWorld = XMMatrixTranspose(g_World); //Set this Position 
 		cb.vMeshColor = g_vMeshColor; //Apply the colour as three floats 
 		cb.view2 = XMMatrixTranspose(CamBhoy.GetViewMatrix()); //Set the view matrix to the Camera's
-		cb.vLightDir[0] = vLightDirs[0];
+		cb.vLightDir[0] = vLightDirs[0]; //Apply Lighting Data
 		cb.vLightDir[1] = vLightDirs[1];
 		cb.vLightColor[0] = vLightColors[0];
 		cb.vLightColor[1] = vLightColors[1];
@@ -1439,7 +1201,7 @@ void Render()
 		//
 		// Render the cube
 		//
-		g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0);
+		g_pImmediateContext->VSSetShader(g_pVertexShader, nullptr, 0); //Send shader data
 		g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pCBChangesEveryFrame);
 		g_pImmediateContext->VSSetConstantBuffers(1, 1, &g_pCBChangeOnResize);
 		g_pImmediateContext->VSSetConstantBuffers(2, 1, &g_pCBChangesEveryFrame);
@@ -1452,10 +1214,10 @@ void Render()
 
 
 
-	CBChangesEveryFrame cb1;
+	CBChangesEveryFrame cb1;  //Create Constant Buffer for the same pricibles as above
 	cb1.mWorld = XMMatrixTranspose(g_World);
 	cb1.view2 = XMMatrixTranspose(g_View);
-	cb1.mProjection2 = XMMatrixTranspose(g_Projection);
+	cb1.mProjection2 = XMMatrixTranspose(CamBhoy.GetProjectionMatrix());
 	cb1.vLightDir[0] = vLightDirs[0];
 	cb1.vLightDir[1] = vLightDirs[1];
 	cb1.vLightColor[0] = vLightColors[0];
@@ -1473,16 +1235,16 @@ void Render()
 	g_pImmediateContext->DrawIndexed(36, 0, 0);
 
 
-	for (int m = 0; m < 2; m++)
+	for (int m = 0; m < 2; m++) //Process both lights
 	{
-		XMMATRIX mLight = XMMatrixTranslationFromVector(5.0f * XMLoadFloat4(&vLightDirs[m]));
-		XMMATRIX mLightScale = XMMatrixScaling(0.3f, 0.3f, 0.3f);
-		mLight = mLightScale * mLight;
+		XMMATRIX mLight = XMMatrixTranslationFromVector(5.0f * XMLoadFloat4(&vLightDirs[m])); //Update Light position
+		XMMATRIX mLightScale = XMMatrixScaling(0.3f, 0.3f, 0.3f); //Scale the Light
+		mLight = mLightScale * mLight; //Apply this to the world of the light
 
 		// Update the world variable to reflect the current light
 		cb1.mWorld = XMMatrixTranspose(mLight);
 		cb1.vOutputColor = vLightColors[m];
-		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb1, 0, 0);
+		g_pImmediateContext->UpdateSubresource(g_pCBChangesEveryFrame, 0, nullptr, &cb1, 0, 0); //Send off lighting data
 
 		g_pImmediateContext->PSSetShader(g_pPixelShaderSolid, nullptr, 0);
 		g_pImmediateContext->DrawIndexed(36, 0, 0);
@@ -1497,13 +1259,7 @@ void Render()
 	{
 		animy = 0;
 	}
-	g_View = CamBhoy.GetViewMatrix();
-	g_Projection = CamBhoy.GetProjectionMatrix();
-	// Initialize the projection matrix
-	g_Projection = XMMatrixPerspectiveFovLH(XM_PIDIV4, WindowWidth / (FLOAT)WindowHeight, 0.01f, 100.0f);
+	g_View = CamBhoy.GetViewMatrix(); //Update global view matrix to be that of the camera
 
-	CBChangeOnResize yus;
-	yus.mProjection = XMMatrixTranspose(g_Projection);
-	g_pImmediateContext->UpdateSubresource(g_pCBChangeOnResize, 0, nullptr, &yus, 0, 0);
 	g_pSwapChain->Present(0, 0);
 }

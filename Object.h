@@ -1,6 +1,5 @@
 #pragma once
 #include "GUtility.h"
-#include "AABB.h"
 class Object //Base object for all rendered objects in the scene, other classes may derive from it
 {
 public:
@@ -33,7 +32,6 @@ public:
 	float minY;
 	float minZ;
 	float maxZ;
-	AABB box = AABB(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1)); //AABB box temporarily public for testing
 private:
 	XMFLOAT3 pos; //Position of the object. Position can be accessed by a get position function
 	XMFLOAT3 rot; //Rotation of the object. Accessed through get and set functions

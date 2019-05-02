@@ -15,20 +15,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DDSTextureLoader.cpp" />
-    <ClCompile Include="CameraMain.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="CameraTest.cpp" />
-    <ClCompile Include="AABB.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="VectorMaths.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="BoundingSphere.cpp">
       <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Target.cpp">
@@ -54,13 +45,7 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="CameraTest.h" />
-    <ClInclude Include="AABB.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="VectorMaths.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="BoundingSphere.h">
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Target.h">

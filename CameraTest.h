@@ -1,8 +1,11 @@
 #pragma once
+
 #include "GUtility.h"
 class CameraTest
 {
 public:
+
+	//All Explained in CameraTest.cpp
 	CameraTest(void);
 	const XMMATRIX & GetViewMatrix() const;
 	const XMMATRIX & GetProjectionMatrix() const;
@@ -17,7 +20,7 @@ public:
 	void SetRotation(float x, float y, float z);
 	void SetRotation(const XMVECTOR &rot);
 	void Rotate(float x, float y, float z);
-	void DirectionalMovement();
+	void MoveFrom(XMFLOAT3 a);
 private:
 	void SetProjection(float fovDeg,float aspectRation,float nears,float fars);
 

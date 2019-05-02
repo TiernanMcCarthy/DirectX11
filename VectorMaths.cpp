@@ -41,19 +41,22 @@ XMFLOAT3 ForwardDirection(XMFLOAT3 euler)  //Supply a Forward Direction Vector
 	return EulerToDirection(EulerRotation.x, EulerRotation.y, EulerRotation.z);
 }
 
-float VectorMagnitude(XMFLOAT3 v1)
+float VectorMagnitude(XMFLOAT3 v1) // Return the Length/Magnitude of the vector
 {
-	//  float temp = Mathf.Sqrt(v1.x * v1.x) + Mathf.Sqrt(v1.y * v1.y)+Mathf.Sqrt(v1.z*v1.z);
 	float temp = sqrtf((v1.x * v1.x) + (v1.y * v1.y) + (v1.z * v1.z));
 	return temp;
 }
 
 
-float LengthSq(XMFLOAT3 v1)
+float LengthSq(XMFLOAT3 v1) //Return the Length Squared of the Vector
 {
 	float temp = VectorMagnitude(v1);
 	return (temp * temp);
 }
+
+//As I began I was unsure of the ideal data types availabe to me for storing coordinates, as such I began using XMFLOAT3s for the simplicity of writing XMFLOAT3(0,0,0)
+
+//However I realised no operations for the data type were written and for convenience wrote my own operator functions
 
 XMFLOAT3 operator *(XMFLOAT3 a, float t) //Allow the multiplication of two XMFLOAT3 Vectors, as it is not natively supported
 {
@@ -86,7 +89,16 @@ XMFLOAT3 VectorLerp(XMFLOAT3 A, XMFLOAT3 B, float t)  //Lerp values between two 
 {
 	return A * (1.0f - t) + B * t;
 }
-XMFLOAT3 operator +=(XMFLOAT3 a, XMFLOAT3 b)
+XMFLOAT3 operator +=(XMFLOAT3 a, XMFLOAT3 b) //Simplify addition and saving with +=
 {
 	return XMFLOAT3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+XMFLOAT3 VectorCrossProduct(XMFLOAT3 A, XMFLOAT3 B) //Return the Crossproduct of two XMFLOAT3s
+{
+	XMFLOAT3 C = XMFLOAT3();
+	C.x = A.y * B.z - A.z * B.y;
+	C.y = A.z * B.x - A.x * B.z;
+	C.z = A.x * B.y - A.y * B.x;
+	return C;
 }

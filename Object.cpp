@@ -28,10 +28,6 @@ Object::Object(XMFLOAT3 position, bool bound)
 {
 	pos = position;
 	bounding = bound;
-	if (bounding == true)
-	{
-		box = AABB(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1));
-	}
 	maxX = 1;
 	maxY = 1;
 	minX = -1;

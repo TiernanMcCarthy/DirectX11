@@ -26,4 +26,5 @@ XMFLOAT3 operator +=(XMFLOAT3 a, XMFLOAT3 b);
 
 XMFLOAT3 VectorLerp(XMFLOAT3 A, XMFLOAT3 B, float t); //Lerp values between two Vectors
 
+XMFLOAT3 VectorCrossProduct(XMFLOAT3 A, XMFLOAT3 B);
 

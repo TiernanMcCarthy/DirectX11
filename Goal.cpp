@@ -1,10 +1,6 @@
 #include "Goal.h"
 
-bool Goal::Finished()
+Goal::Goal()
 {
-	return Done;
-}
-Object Goal::SupplyObject()
-{
-	return function;
+
 }
