@@ -19,7 +19,6 @@ cbuffer cbChangesEveryFrame : register( b2 )
 {
     matrix World;
 	matrix View2;
-	matrix Projection2;
     float4 vMeshColor;
 
 	float4 vLightDir[2]; //Addition of lighting variables from tutorial 06

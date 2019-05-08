@@ -1,7 +1,0 @@
-﻿  Tutorial04.cpp
-d:\directx11\cameratest.h(36): warning C4324: 'CameraTest': structure was padded due to alignment specifier
-d:\directx11\tutorial04.cpp(93): warning C4100: 'z': unreferenced formal parameter
-d:\directx11\tutorial04.cpp(247): error C2719: 'a': formal parameter with requested alignment of 16 won't be aligned
-d:\directx11\tutorial04.cpp(247): error C2719: 'b': formal parameter with requested alignment of 16 won't be aligned
-d:\directx11\tutorial04.cpp(317): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-d:\directx11\tutorial04.cpp(318): warning C4244: '=': conversion from 'int' to 'float', possible loss of data

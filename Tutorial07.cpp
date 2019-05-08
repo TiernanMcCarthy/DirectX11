@@ -76,7 +76,6 @@ struct CBChangesEveryFrame // The main constant buffer object. The world of each
 	XMMATRIX mWorld;
 
 	XMMATRIX view2;
-	XMMATRIX mProjection2; //Possibly not needed and our view2 matrix;
 	//Lighting variables from tutorial 06.
 	XMFLOAT4 vMeshColor;
 	XMFLOAT4 vLightDir[2];
@@ -204,7 +203,7 @@ HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow)
 	g_hInst = hInstance;
 	RECT rc = { 0, 0, WindowWidth, WindowHeight };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-	g_hWnd = CreateWindow(L"TutorialWindowClass", L"Direct3D 11 Tutorial 7",
+	g_hWnd = CreateWindow(L"TutorialWindowClass", L"UP857997 DirectX11",
 		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
 		CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
 		nullptr);
@@ -906,7 +905,7 @@ void CheckIfWon()
 	{
 		holding = false;
 		grabbing = false;
-		Reset();
+		//Reset();
 		WndProc(g_hWnd, WM_DESTROY, NULL, NULL); //Shutdown
 	}
 	else //The attempt failed
@@ -1217,7 +1216,6 @@ void Render()
 	CBChangesEveryFrame cb1;  //Create Constant Buffer for the same pricibles as above
 	cb1.mWorld = XMMatrixTranspose(g_World);
 	cb1.view2 = XMMatrixTranspose(g_View);
-	cb1.mProjection2 = XMMatrixTranspose(CamBhoy.GetProjectionMatrix());
 	cb1.vLightDir[0] = vLightDirs[0];
 	cb1.vLightDir[1] = vLightDirs[1];
 	cb1.vLightColor[0] = vLightColors[0];

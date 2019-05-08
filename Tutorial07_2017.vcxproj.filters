@@ -18,7 +18,6 @@
     <ClCompile Include="Object.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="CameraTest.cpp" />
     <ClCompile Include="VectorMaths.cpp">
       <Filter>Game</Filter>
     </ClCompile>
@@ -26,6 +25,9 @@
       <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Goal.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraTest.cpp">
       <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,7 +46,6 @@
     <ClInclude Include="Object.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="CameraTest.h" />
     <ClInclude Include="VectorMaths.h">
       <Filter>Game</Filter>
     </ClInclude>
@@ -52,6 +53,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Goal.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraTest.h">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

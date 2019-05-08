@@ -24,10 +24,6 @@ public:
 private:
 	void SetProjection(float fovDeg,float aspectRation,float nears,float fars);
 
-
-
-
-
 private:
 
 	XMFLOAT3 Eye; //Pos

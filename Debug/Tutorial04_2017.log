@@ -1,5 +1,0 @@
-﻿  Tutorial04.cpp
-f:\directx-sdk-samples-master\direct3d11tutorials\tutorial04\tutorial04.cpp(235): warning C4100: 'box2': unreferenced formal parameter
-f:\directx-sdk-samples-master\direct3d11tutorials\tutorial04\tutorial04.cpp(336): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-f:\directx-sdk-samples-master\direct3d11tutorials\tutorial04\tutorial04.cpp(337): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-  Tutorial04_2017.vcxproj -> F:\directx-sdk-samples-master\Direct3D11Tutorials\Tutorial04\Debug\Tutorial04.exe
